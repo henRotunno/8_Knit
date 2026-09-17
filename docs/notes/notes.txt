@@ -1,1 +1,3 @@
 Notes file for Team 8: Weavers
+
+17 September 2026: Refactored the codebase, adjusted setting, handled SECRET_KEY, created repository on GitHub, pushed codebase to GitHub. Created "tester" branch to practice merging.
