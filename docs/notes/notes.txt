@@ -1,1 +1,4 @@
 Notes file for Team 8: Weavers
+
+17 September 2026: Refactored the codebase, hid api key, pushed to GitHub. Created "tester" branch to practice merging.
+
