@@ -2,8 +2,16 @@ Notes file for Team 8: Weavers
 
 17 September 2026: Refactored the codebase, adjusted setting, handled SECRET_KEY, created repository on GitHub, pushed codebase to GitHub. Created "tester" branch to practice merging.
 
+20 September 2026: Our team met at 3 P.M to work on assignment 2
+
 NEXT: Document the 4 Views and explain their purpose:
-    1)
+    1) View for friend list. When a user clicks on their friends list, they will see all of their friends on Knit. Thus, we need to establish the connection to the model.
     2)
     3)
     4)
+
+Views steps:
+    Create the function in views.py
+    Creat the .html
+    Loop through data in .html
+    Establish the url in urls.py
