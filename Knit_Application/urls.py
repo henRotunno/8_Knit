@@ -19,7 +19,11 @@ from django.contrib import admin
 from django.urls import path
 from activities import views
 
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("friends/", views.friends_list, name="friends"),
-]
+    path("notifications/", views.notifications, name="notifications"),
+    path("recommendations/", views.Recommendation.as_view(), name="recommendations"),
+    path("activities/", views.Hobbies.as_view(), name="activities"),]

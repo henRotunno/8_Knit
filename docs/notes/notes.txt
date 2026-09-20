@@ -5,13 +5,15 @@ Notes file for Team 8: Weavers
 20 September 2026: Our team met at 3 P.M to work on assignment 2
 
 NEXT: Document the 4 Views and explain their purpose:
-    1) View for friend list. When a user clicks on their friends list, they will see all of their friends on Knit. Thus, we need to establish the connection to the model.
-    2)
-    3)
-    4)
+    1) Render - View for friend list. When a user clicks on their friends list, they will see all of their friends on Knit. Thus, we need to establish the connection to the model.
+    2) HttpResponse - View for notifications. The user can get important updates like friend requests or alerts on this page.
+    3) Generic CBV  - View for recommendations. A page where the user can find activies/hobbies they might be interested in.
+    4) Base CBV - View for activities. This is the focal point of the app. Users can find hobbies or start activities.
 
 Views steps:
     Create the function in views.py
     Creat the .html
     Loop through data in .html
     Establish the url in urls.py
+    Make migrations
+    Refresh
