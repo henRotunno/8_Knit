@@ -1,3 +1,27 @@
 Notes file for Team 8: Weavers
 
 17 September 2026: Refactored the codebase, adjusted setting, handled SECRET_KEY, created repository on GitHub, pushed codebase to GitHub. Created "tester" branch to practice merging.
+
+20 September 2026: Our team met at 3 P.M to work on assignment 2. We implemented and tested four Django views, connected each view to a named URL, and created basic templates for displaying model data. We also continued organizing the project documentation and deliverables.
+
+NEXT: Document the 4 Views and explain their purpose:
+    1) Render - View for friend list. When a user clicks on their friends list, they will see all of their friends on Knit. Thus, we need to establish the connection to the model.
+    2) HttpResponse - View for notifications. The user can get important updates like friend requests or alerts on this page.
+    3) Generic CBV  - View for recommendations. A page where the user can find activies/hobbies they might be interested in.
+    4) Base CBV - View for activities. This is the focal point of the app. Users can find hobbies or start activities.
+
+Views steps:
+    Create the function in views.py
+    Creat the .html
+    Loop through data in .html
+    Establish the url in urls.py
+    Make migrations
+    Refresh
+
+View Reflections:
+
+HttpResponse vs render:
+HttpResponse is useful for returning simple content directly, while render() is more convenient when displaying data through reusable HTML templates.
+
+Base CBV vs Generic CBV:
+Base CBVs give us more control over request handling, while Generic CBVs reduce repeated code for common tasks such as displaying lists of model objects.

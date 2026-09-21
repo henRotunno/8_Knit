@@ -55,6 +55,14 @@ class Recommendations(models.Model):
     activity_id = models.ForeignKey(Activities, on_delete=models.CASCADE)
     recommendation_name = models.CharField(max_length=40)
 
+# render view (function based 1)
+class Friends(models.Model):
+    friendslist_id = models.AutoField(primary_key=True)  # primary key
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE) # user
+
+
+# http response (function based 2)
+
 
 
 
