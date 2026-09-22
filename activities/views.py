@@ -5,6 +5,9 @@ from django.views.generic import ListView
 from django.http import HttpResponse
 from django.template import loader
 
+def home(request):
+    return render(request, 'home.html')
+
 def friends_list(request):
     friends = Friends.objects.all()
     return render(request, "friend_list.html", {"friends": friends})
@@ -33,3 +36,4 @@ class Hobbies(View):
             context={'hobbies': Activities.objects.all()}
         )
 # base
+

@@ -26,4 +26,6 @@ urlpatterns = [
     path("friends/", views.friends_list, name="friends"),
     path("notifications/", views.notifications, name="notifications"),
     path("recommendations/", views.Recommendation.as_view(), name="recommendations"),
-    path("activities/", views.Hobbies.as_view(), name="activities"),]
+    path("activities/", views.Hobbies.as_view(), name="activities"),
+    path("", views.home, name="home")
+]
