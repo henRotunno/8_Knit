@@ -12,4 +12,4 @@ invitations to participate in group activities are often scattered
 across different platforms, such as Facebook, Reddit, and group
 chats. Therefore, the Weavers would like to create an app that
 brings people with similar interests together, allows them to
-participate in activities, and helps them build new friendships..
+participate in activities, and helps them build new friendships.
