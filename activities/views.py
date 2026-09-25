@@ -36,5 +36,9 @@ class Hobbies(View):
             context={'Activities': Activities.objects.all()}
         )
 # base
+from django.views.generic import DetailView
 
+class ActivityDetail(DetailView):
+    model = Activities
+    template_name = "activity_detail.html"
 

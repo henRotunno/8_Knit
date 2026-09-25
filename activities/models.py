@@ -29,7 +29,11 @@ class Activities(models.Model):
     class Meta:
         ordering = ['activity_name']
 
+    def __str__(self):
+        return self.activity_name
 
+    def get_absolute_url(self):
+        return reverse("activity-detail", kwargs={"pk": self.pk})
 """"
 Table for notifications, describes what the notification is, the time, and if the message was read
 """""
