@@ -1,0 +1,46 @@
+========================================================================================================================
+                                 GIT BRANCHING STRATEGY FOR KNIT
+========================================================================================================================
+
+                                                  Central Repository
+                                                  ------------------
+  Main (main)
+  Production-ready code.        main 1.0 (Setup, base.html)                                     main 1.1 (All Features Live)
+  Only merges via approved PRs. ----(●)-------------------(●)-------------(●)-------------(●)----------------(●)--------->
+                                     \                     ^               ^               ^                  ^
+                                      \       PR #1 Merge /   PR #2 Merge /   PR #3 Merge /      PR #4 Merge /
+                                       \                 /               /               /                  /
+  Feature Branches                      \               /               /               /                  /
+  Each branch holds one route's          +--(●)-------(●)              /               /                  /
+  view + template.                       |  feature/friends            |               |                  |
+                                         |  views.friends_list         |               |                  |
+                                         |  friends.html               |               |                  |
+                                         |                             |               |                  |
+                                         +------(●)------------------(●)               |                  |
+                                         |      feature/notifications                  |                  |
+                                         |      views.notifications                    |                  |
+                                         |      notifications.html                     |                  |
+                                         |                                             |                  |
+                                         +-----------------------------------(●)-----(●)                  |
+                                         |                                   feature/recommendations      |
+                                         |                                   Recommendation CBV           |
+                                         |                                   recommendations.html         |
+                                         |                                                                |
+                                         +------------------------------------------------------(●)-----(●)
+                                                                                                feature/activities
+                                                                                                Hobbies CBV
+                                                                                                activities.html
+========================================================================================================================
+LEGEND:
+  (●) Main Commit / Merge Point     |  feature/friends          --> views.friends_list & friends.html
+  --- Main Branch Track             |  feature/notifications    --> views.notifications & notifications.html
+   \  Branch creation off main      |  feature/recommendations  --> Recommendation.as_view() & recommendations.html
+   /  Pull Request merge into main  |  feature/activities       --> Hobbies.as_view() & activities.html
+========================================================================================================================
+KEY PRINCIPLES FOR THE TEAM:
+
+  1. ISOLATE BY ROUTE                     2. SYNC BEFORE MERGING              3. CODE REVIEW (PR)
+     One developer per feature branch.       Always run 'git pull origin         Require at least 1 peer approval
+     Keep views and templates packaged       main' into your branch to avoid     to verify urls.py routing and
+     together to prevent conflicts.          conflicts in urls.py.               template rendering before merge.
+========================================================================================================================
