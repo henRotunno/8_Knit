@@ -27,3 +27,4 @@ Base CBV vs Generic CBV:
 Base CBVs give us more control over request handling, while Generic CBVs reduce repeated code for common tasks such as displaying lists of model objects.
 
 25 September 2026: Added home page (home.html) with navigation bar.
+    -Added get_absolute url for activities, notifications, and friends.
