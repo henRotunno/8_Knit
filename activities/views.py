@@ -42,3 +42,11 @@ class ActivityDetail(DetailView):
     model = Activities
     template_name = "activity_detail.html"
 
+class FriendDetail(DetailView):
+    model = Friends
+    template_name = "friend_detail.html"
+
+class NotificationDetail(DetailView):
+    model = Notifications
+    template_name = "notifcation_detail.html"
+

@@ -29,4 +29,6 @@ urlpatterns = [
     path("activities/", views.Hobbies.as_view(), name="activities"),
     path("", views.home, name="home"),
     path("activities/<int:pk>/", views.ActivityDetail.as_view(), name="activity-detail"),
+    path("activities/<int:pk>/", views.FriendDetail.as_view(), name="friend-detail"),
+    path("notifications/<int:pk>/", views.NotificationDetail.as_view(), name="notification-detail"),
 ]
