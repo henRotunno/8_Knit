@@ -32,8 +32,8 @@ class Hobbies(View):
     def get(self, request):
         return render(
             request,
-            'hobbies.html',
-            context={'hobbies': Activities.objects.all()}
+            'activities.html',
+            context={'Activities': Activities.objects.all()}
         )
 # base
 
