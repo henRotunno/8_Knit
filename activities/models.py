@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 """""
@@ -13,6 +14,8 @@ class User(models.Model):
     email = models.EmailField(max_length=50, unique=True)
     password = models.CharField(max_length=16)
 
+
+
 """"
 Table for all of the UNIQUE activities 
 Sorted by activity_name
@@ -25,6 +28,7 @@ class Activities(models.Model):
 
     class Meta:
         ordering = ['activity_name']
+
 
 """"
 Table for notifications, describes what the notification is, the time, and if the message was read

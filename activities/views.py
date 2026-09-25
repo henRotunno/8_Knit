@@ -37,3 +37,4 @@ class Hobbies(View):
         )
 # base
 
+

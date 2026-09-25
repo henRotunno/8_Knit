@@ -26,4 +26,4 @@ HttpResponse is useful for returning simple content directly, while render() is 
 Base CBV vs Generic CBV:
 Base CBVs give us more control over request handling, while Generic CBVs reduce repeated code for common tasks such as displaying lists of model objects.
 
-25 September 2026: Added home page with navigation bar.
+25 September 2026: Added home page (home.html) with navigation bar.
