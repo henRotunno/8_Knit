@@ -5,18 +5,35 @@
 {% endblock %}
 
 
+
+
 <!------------------------------------------------------------>
 <!-- Block: Content -->
 
 {% block content %}
   <div class="d-flex align-items-center justify-content-between mt-3">
     <h2 style="text-align: center;" class="mb-0">Friend List</h2>
+    <p style="text-align: center;">Total friends: {{ count }}</p>
   </div>
+
+
+
+  <form style="text-align:center;" method="post" class="row g-2 align-items-center mt-4">
+    {% csrf_token %}
+    <div class="col-12 col-sm-6 col-md-4">
+      <input type="search" name="q" value="{{ q }}" class="form-control"
+             placeholder="Search by name:">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Search</button>
+      {% if q %}<a class="btn btn-outline-secondary ms-2" href="{% url 'friends' %}">Clear</a>{% endif %}
+    </div>
+  </form> <!-- csrf token is missing error, added token -->
 
   <div class="card mt-3">
     <div class="card-body p-3">
       <ul class="mb-0">
-        {% for friend in friends %}
+        {% for friend in Friends %}
           <li class="mb-1">
             <a href="{{ friend.get_absolute_url }}">{{ friend }}</a>
           </li>

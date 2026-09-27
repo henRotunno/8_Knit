@@ -65,11 +65,14 @@ class Recommendations(models.Model):
 
 # render view (function based 1)
 class Friends(models.Model):
-    friendslist_id = models.AutoField(primary_key=True)  # primary key
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE) # user
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendships")
+    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friend_of")
 
+    def __str__(self):
+        return self.friend.username
 
-
+    def get_absolute_url(self):
+        return reverse("friend-detail", kwargs={"pk": self.pk})
 # http response (function based 2)
 
 

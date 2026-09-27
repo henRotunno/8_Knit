@@ -4,14 +4,21 @@
     Activities
 {% endblock %}
 
-
-<!------------------------------------------------------------>
-<!-- Block: Content -->
-
 {% block content %}
-  <div style=text-align:center; class="d-flex align-items-center justify-content-between mt-3">
-    <h2 class="mb-0">Activities</h2>
+  <div class="d-flex align-items-center justify-content-between mt-3">
+    <h2 style="text-align:center;" class="mb-0">Activities </h2>
   </div>
+
+  <form style="text-align:center;" method="get" class="row g-2 align-items-center mt-4">
+    <div class="col-12 col-sm-6 col-md-4">
+      <input type="search" name="q" value="{{ q }}" class="form-control"
+             placeholder="Search by activity:">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Search</button>
+      {% if q %}<a class="btn btn-outline-secondary ms-2" href="{% url 'activities' %}">Clear</a>{% endif %}
+    </div>
+  </form>
 
   <div class="card mt-3">
     <div class="card-body p-3">
