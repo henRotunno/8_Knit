@@ -1,10 +1,31 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+    <style>
+    .navigation {
+        text-align:center;
+    }
+    .navigation a {
+        margin: 0 10px;
+    }
+    </style>
+
 </head>
 <body>
+    <div class="navigation">
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'friends' %}">Friends</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'recommendations' %}">Recommendations</a>
+            <a href="{% url 'activities' %}">Activities</a>
+        </nav>
+    </div>
+
     {% block content %}
     {% endblock %}
 </body>
