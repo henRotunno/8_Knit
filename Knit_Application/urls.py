@@ -31,4 +31,6 @@ urlpatterns = [
     path("activities/<int:pk>/", views.ActivityDetail.as_view(), name="activity-detail"),
     path("friends/<int:pk>/", views.FriendDetail.as_view(), name="friend-detail"),
     path("notifications/<int:pk>/", views.NotificationDetail.as_view(), name="notification-detail"),
+    path("stats-chart/", views.stats_chart, name="stats-chart"),
+    path("stats/", views.stats, name="stats"),
 ]

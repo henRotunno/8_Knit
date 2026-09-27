@@ -71,3 +71,33 @@ class NotificationDetail(DetailView):
     model = Notifications
     template_name = "notifcation_detail.html"
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from django.db.models import Count
+import io
+
+def stats_chart(request):
+    category_counts = Activities.objects.values('category').annotate(total=Count('activity_id')).order_by('-total')
+
+    labels = [c['category'] or "Uncategorized" for c in category_counts]
+    counts = [c['total'] for c in category_counts]
+
+    fig, ax = plt.subplots()
+    ax.bar(labels, counts, color='#4C72B0')
+    ax.set_title('Activities per Category')
+    ax.set_ylabel('Count')
+    plt.xticks(rotation=30, ha='right')
+    fig.tight_layout()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    plt.close(fig)
+    buf.seek(0)
+
+    return HttpResponse(buf.getvalue(), content_type='image/png')
+
+
+def stats(request):
+    return render(request, 'stats.html')
+

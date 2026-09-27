@@ -24,7 +24,7 @@ Sorted by activity_name
 class Activities(models.Model):
     activity_id = models.AutoField(primary_key=True) # one to many from User table
     activity_name = models.CharField(max_length=40, unique=True) # constraint, avoid duplicate activities
-
+    category = models.CharField(max_length=30, blank=True, default="")
 
     class Meta:
         ordering = ['activity_name']
