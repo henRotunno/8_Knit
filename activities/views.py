@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from activities.models import Friends, Notifications, Recommendations, Activities
 from django.shortcuts import get_object_or_404, render
 from django.views import View
@@ -5,9 +7,24 @@ from django.views.generic import ListView
 from django.http import HttpResponse
 from django.template import loader
 
+def home(request):
+    return render(request, 'home.html')
+
 def friends_list(request):
     friends = Friends.objects.all()
-    return render(request, "friend_list.html", {"friends": friends})
+    q = ""
+
+
+    if request.method == "POST":
+        q = request.POST.get("q", "")
+
+        if q:
+            friends = Friends.objects.filter(Q(friend__username__icontains=q))
+    return render(
+    request,
+    'friend_list.html',
+    context={'Friends': friends, 'q': q, 'count': Friends.objects.count()}
+    )
 # view number 1 with render
 
 def notifications(request):
@@ -27,9 +44,30 @@ class Recommendation(ListView):
 
 class Hobbies(View):
     def get(self, request):
+        q = request.GET.get("q", "")
+
+        if q:
+            activities = Activities.objects.filter(Q(activity_name__icontains=q))
+        else:
+            activities = Activities.objects.all()
+
         return render(
-            request,
-            'hobbies.html',
-            context={'hobbies': Activities.objects.all()}
-        )
+        request,
+        'activities.html',
+        context={'Activities': activities, 'q': q}
+    )
 # base
+from django.views.generic import DetailView
+
+class ActivityDetail(DetailView):
+    model = Activities
+    template_name = "activity_detail.html"
+
+class FriendDetail(DetailView):
+    model = Friends
+    template_name = "friend_detail.html"
+
+class NotificationDetail(DetailView):
+    model = Notifications
+    template_name = "notifcation_detail.html"
+
