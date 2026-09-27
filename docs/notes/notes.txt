@@ -29,8 +29,5 @@ Base CBVs give us more control over request handling, while Generic CBVs reduce 
 25 September 2026: Added home page (home.html) with navigation bar.
     -Added get_absolute url for activities, notifications, and friends.
 
-27 September 2026: Our group met to discuss the project and divide work.
-    -TODO
-        1) Section 1 is complete
-        2) Section 2: GET for Activities, POST for Friends
-        3)
+27 September 2026: Added logo, static setup, CSS integration
+    - to-do: change font and logo
