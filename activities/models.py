@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 """""
@@ -13,6 +14,8 @@ class User(models.Model):
     email = models.EmailField(max_length=50, unique=True)
     password = models.CharField(max_length=16)
 
+
+
 """"
 Table for all of the UNIQUE activities 
 Sorted by activity_name
@@ -26,6 +29,11 @@ class Activities(models.Model):
     class Meta:
         ordering = ['activity_name']
 
+    def __str__(self):
+        return self.activity_name
+
+    def get_absolute_url(self):
+        return reverse("activity-detail", kwargs={"pk": self.pk})
 """"
 Table for notifications, describes what the notification is, the time, and if the message was read
 """""
@@ -57,10 +65,14 @@ class Recommendations(models.Model):
 
 # render view (function based 1)
 class Friends(models.Model):
-    friendslist_id = models.AutoField(primary_key=True)  # primary key
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE) # user
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendships")
+    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friend_of")
 
+    def __str__(self):
+        return self.friend.username
 
+    def get_absolute_url(self):
+        return reverse("friend-detail", kwargs={"pk": self.pk})
 # http response (function based 2)
 
 

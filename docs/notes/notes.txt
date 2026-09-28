@@ -27,4 +27,21 @@ Base CBV vs Generic CBV:
 Base CBVs give us more control over request handling, while Generic CBVs reduce repeated code for common tasks such as displaying lists of model objects.
 
 25 September 2026: Added home page (home.html) with navigation bar.
+
     -Added get_absolute url for activities, notifications, and friends.
+
+    -Added get_absolute url for activities, notifications, and friends.
+
+27 September 2026: Our group met to discuss the project and divide work.
+    -TODO
+        1) Section 1 is complete
+        2) Section 2: GET for Activities, POST for Friends
+        3) Section 3: Static files and UI styling.
+        4) Section 4: Data Visualization.
+        5) Section 5: Forms and User Input.
+        6) Section 6: Creating APIs.
+
+Section 6: Creating APIs
+We created an API endpoint using Django JsonResponse to serve activity data from the Activities model. The endpoint supports filtering through the q query parameter using activity_name__icontains.
+The API serves each activity's activity_id and activity_name. We also added a standard HttpResponse endpoint to compare the response type with JsonResponse.
+
