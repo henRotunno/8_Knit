@@ -13,3 +13,13 @@ across different platforms, such as Facebook, Reddit, and group
 chats. Therefore, the Weavers would like to create an app that
 brings people with similar interests together, allows them to
 participate in activities, and helps them build new friendships.
+
+## API
+
+The project includes an Activities API endpoint that returns activity data in JSON format.
+
+- `/api/activities/` returns all activities using `JsonResponse`.
+- `/api/activities/?q=run` filters activities using the `q` query parameter.
+- `/api/activities-http/` returns the same activity data using a standard `HttpResponse` for comparison.
+
+The JSON API returns activity IDs and activity names from the Activities model.
