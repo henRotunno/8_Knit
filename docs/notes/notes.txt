@@ -42,7 +42,4 @@ Section 6: Creating APIs
 We created an API endpoint using Django JsonResponse to serve activity data from the Activities model. The endpoint supports filtering through the q query parameter using activity_name__icontains.
 The API serves each activity's activity_id and activity_name. We also added a standard HttpResponse endpoint to compare the response type with JsonResponse.
 
-
 27 September 2026: Added logo, static setup, CSS integration
-    - to-do: change font and logo
-    - added the chart with each category of activity, completed section 4
