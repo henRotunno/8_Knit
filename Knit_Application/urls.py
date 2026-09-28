@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from activities import views
+from activities.api_views import activities_api, activities_http_api
 
 
 
@@ -31,4 +32,7 @@ urlpatterns = [
     path("activities/<int:pk>/", views.ActivityDetail.as_view(), name="activity-detail"),
     path("friends/<int:pk>/", views.FriendDetail.as_view(), name="friend-detail"),
     path("notifications/<int:pk>/", views.NotificationDetail.as_view(), name="notification-detail"),
+
+    path("api/activities/", activities_api, name="activities_api"),
+    path("api/activities-http/", activities_http_api, name="activities_http_api"),
 ]
