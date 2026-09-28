@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from activities.models import Friends, Notifications, Recommendations, Activities
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import ListView
 from django.http import HttpResponse
@@ -43,19 +43,44 @@ class Recommendation(ListView):
 # generic
 
 class Hobbies(View):
+
     def get(self, request):
         q = request.GET.get("q", "")
 
         if q:
-            activities = Activities.objects.filter(Q(activity_name__icontains=q))
+            activities = Activities.objects.filter(
+                Q(activity_name__icontains=q)
+            )
         else:
             activities = Activities.objects.all()
 
         return render(
-        request,
-        'activities.html',
-        context={'Activities': activities, 'q': q}
-    )
+            request,
+            "activities.html",
+            context={
+                "Activities": activities,
+                "q": q
+            }
+        )
+
+    def post(self, request):
+        q = request.POST.get("q") or request.GET.get("q")
+
+        if q:
+            activities = Activities.objects.filter(
+                Q(activity_name__icontains=q)
+            )
+        else:
+            activities = Activities.objects.all()
+
+        return render(
+            request,
+            "activities.html",
+            context={
+                "Activities": activities,
+                "q": q
+            }
+        )
 # base
 from django.views.generic import DetailView
 
