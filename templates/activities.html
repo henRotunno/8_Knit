@@ -10,6 +10,15 @@
     <h2 style="text-align:center;" class="mb-0">Activities</h2>
 </div>
 
+    <div class="activity-summary" style="text-align:center;">
+  <p>Total activities: {{ total_activities }}</p>
+  <ul>
+    {% for row in activities_per_category %}
+      <li>{{ row.category|default:"Uncategorized" }}: {{ row.total }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
 
 <!-- GET FORM: Search -->
 <form style="text-align:center;"

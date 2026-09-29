@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db.models import Count
 
 from activities.models import Friends, Notifications, Recommendations, Activities
 from django.shortcuts import get_object_or_404, render, redirect
@@ -44,43 +45,39 @@ class Recommendation(ListView):
 
 class Hobbies(View):
 
+    def build_response(self, request, q):
+        if q:
+            activities = Activities.objects.filter(Q(activity_name__icontains=q))
+        else:
+            activities = Activities.objects.all()
+
+        # Aggregations based on the filtered results
+        total_activities = activities.count()
+        activities_per_category = (
+            activities
+            .values('category')
+            .annotate(total=Count('activity_id'))
+            .order_by('-total')
+        )
+
+        return render(
+            request,
+            "activities.html",
+            context={
+                "Activities": activities,
+                "q": q,
+                "total_activities": total_activities,
+                "totals": activities_per_category,
+            }
+        )
+
     def get(self, request):
         q = request.GET.get("q", "")
-
-        if q:
-            activities = Activities.objects.filter(
-                Q(activity_name__icontains=q)
-            )
-        else:
-            activities = Activities.objects.all()
-
-        return render(
-            request,
-            "activities.html",
-            context={
-                "Activities": activities,
-                "q": q
-            }
-        )
+        return self.build_response(request, q)
 
     def post(self, request):
-        q = request.POST.get("q") or request.GET.get("q")
-
-        if q:
-            activities = Activities.objects.filter(
-                Q(activity_name__icontains=q)
-            )
-        else:
-            activities = Activities.objects.all()
-
-        return render(
-            request,
-            "activities.html",
-            context={
-                "Activities": activities,
-                "q": q
-            }
-        )
+        q = request.POST.get("q") or request.GET.get("q") or ""
+        return self.build_response(request, q)
 # base
 from django.views.generic import DetailView
 
