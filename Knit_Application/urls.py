@@ -37,4 +37,5 @@ urlpatterns = [
     path("api/activities-http/", activities_http_api, name="activities_http_api"),
     path("stats-chart/", views.stats_chart, name="stats-chart"),
     path("stats/", views.stats, name="stats"),
+    path("api/recommend/", views.recommend_activity, name="recommend_activity"),
 ]
