@@ -18,7 +18,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from activities import views
-from activities.api_views import activities_api, activities_http_api
+from activities.api_views import (
+    activities_api,
+    activities_http_api,
+    activity_category_summary,
+    user_friend_summary
+)
+from django.views.generic import TemplateView
+from django.views.generic import RedirectView
+from django.templatetags.static import static
 
 
 
@@ -38,4 +46,38 @@ urlpatterns = [
     path("stats-chart/", views.stats_chart, name="stats-chart"),
     path("stats/", views.stats, name="stats"),
     path("api/recommend/", views.recommend_activity, name="recommend_activity"),
+    path(
+         "api/chart/activity-categories/",
+         activity_category_summary,
+         name="activity_category_summary",
+        ),
+    path(
+         "api/chart/user-friends/",
+         user_friend_summary,
+         name="user_friend_summary",
+        ),
+    path(
+        "vega-lite/",
+        TemplateView.as_view(template_name="vega_charts.html"),
+        name="vega-charts",
+        ),
+    path(
+        "vega-lite/chart1.png",
+        RedirectView.as_view(
+            url=static("vega/activity_categories_bar.png"),
+            permanent=False,
+        ),
+        name="vega-chart1",
+    ),
+
+    path(
+        "vega-lite/chart2.png",
+        RedirectView.as_view(
+            url=static("vega/user_friends_scatter.png"),
+            permanent=False,
+        ),
+        name="vega-chart2",
+    ),
+
+
 ]
