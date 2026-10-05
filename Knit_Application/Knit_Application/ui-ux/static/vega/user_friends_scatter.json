@@ -1,0 +1,93 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Number of friends associated with each user.",
+  "title": "Friend Count by User",
+
+  "width": 500,
+  "height": 300,
+
+  "data": {
+    "url": "/api/chart/user-friends/"
+  },
+
+  "layer": [
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 220,
+        "tooltip": true
+      },
+
+      "encoding": {
+        "x": {
+          "field": "user_id",
+          "type": "quantitative",
+          "title": "User ID",
+          "scale": {
+            "domain": [0.8, 2.2]
+          },
+          "axis": {
+            "values": [1, 2],
+            "format": "d"
+          }
+        },
+
+        "y": {
+          "field": "friend_count",
+          "type": "quantitative",
+          "title": "Number of Friends",
+          "scale": {
+            "domain": [-0.2, 2.2]
+          },
+          "axis": {
+            "values": [0, 1, 2],
+            "format": "d"
+          }
+        },
+
+        "tooltip": [
+          {
+            "field": "username",
+            "type": "nominal",
+            "title": "Username"
+          },
+          {
+            "field": "user_id",
+            "type": "quantitative",
+            "title": "User ID"
+          },
+          {
+            "field": "friend_count",
+            "type": "quantitative",
+            "title": "Friend Count"
+          }
+        ]
+      }
+    },
+
+    {
+      "mark": {
+        "type": "text",
+        "dy": -15
+      },
+
+      "encoding": {
+        "x": {
+          "field": "user_id",
+          "type": "quantitative"
+        },
+
+        "y": {
+          "field": "friend_count",
+          "type": "quantitative"
+        },
+
+        "text": {
+          "field": "username",
+          "type": "nominal"
+        }
+      }
+    }
+  ]
+}

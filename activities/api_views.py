@@ -1,7 +1,8 @@
 import json
 
 from django.http import JsonResponse, HttpResponse
-from activities.models import Activities
+from django.db.models import Count
+from activities.models import Activities, User
 
 
 def activities_api(request):
@@ -36,3 +37,22 @@ def activities_http_api(request):
         json.dumps(data),
         content_type="text/plain"
     )
+def activity_category_summary(request):
+    data = list(
+        Activities.objects
+        .values("category")
+        .annotate(count=Count("activity_id"))
+        .order_by("category")
+    )
+
+    return JsonResponse(data, safe=False)
+
+def user_friend_summary(request):
+    data = list(
+        User.objects
+        .annotate(friend_count=Count("friendships"))
+        .values("user_id", "username", "friend_count")
+        .order_by("user_id")
+    )
+
+    return JsonResponse(data, safe=False)

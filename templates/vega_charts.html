@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Vega-Lite Charts
+{% endblock %}
+
+{% block content %}
+
+    <div id="activity-category-chart"></div>
+
+    <hr>
+
+    <div id="user-friends-chart"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <script>
+        vegaEmbed(
+            "#activity-category-chart",
+            "{% static 'vega/activity_categories_bar.json' %}"
+        ).catch(console.error);
+
+        vegaEmbed(
+            "#user-friends-chart",
+            "{% static 'vega/user_friends_scatter.json' %}"
+        ).catch(console.error);
+    </script>
+
+{% endblock %}

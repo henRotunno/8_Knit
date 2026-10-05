@@ -1,0 +1,54 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Number of activities in each category.",
+  "title": "Activities by Category",
+
+  "width": 500,
+  "height": 300,
+
+  "data": {
+    "url": "/api/chart/activity-categories/"
+  },
+
+  "mark": {
+    "type": "bar",
+    "tooltip": true
+  },
+
+  "encoding": {
+    "x": {
+      "field": "category",
+      "type": "nominal",
+      "title": "Activity Category",
+      "axis": {
+        "labelAngle": 0
+      }
+    },
+
+    "y": {
+      "field": "count",
+      "type": "quantitative",
+      "title": "Number of Activities",
+      "scale": {
+        "domain": [0, 2]
+      },
+      "axis": {
+        "values": [0, 1, 2],
+        "format": "d"
+      }
+    },
+
+    "tooltip": [
+      {
+        "field": "category",
+        "type": "nominal",
+        "title": "Category"
+      },
+      {
+        "field": "count",
+        "type": "quantitative",
+        "title": "Count"
+      }
+    ]
+  }
+}

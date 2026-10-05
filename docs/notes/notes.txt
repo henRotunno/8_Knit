@@ -48,3 +48,21 @@ The API serves each activity's activity_id and activity_name. We also added a st
 
 27 September 2026: Added logo, static setup, CSS integration
     - to-do: change font and logo
+
+
+Part 1: Internal API & Vega-Lite Charts
+
+Created two database-backed internal JSON endpoints for Vega-Lite visualizations.
+
+1) /api/chart/activity-categories/
+   - Aggregates Activities by category using Count().
+   - Used as the data source for the Activities by Category bar chart.
+
+2) /api/chart/user-friends/
+   - Returns each user's ID, username, and friend count.
+   - Used as the data source for the Friend Count by User scatter chart.
+
+Both Vega-Lite specifications load data through API URLs rather than inline data.
+The charts are embedded on /vega-lite/ and chart outputs are also available through:
+- /vega-lite/chart1.png
+- /vega-lite/chart2.png
