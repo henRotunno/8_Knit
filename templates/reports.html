@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Reports</title>
+</head>
+
+
+<body>
+
+
+   <h1>Activity Reports</h1>
+
+
+   <!-- Total -->
+   <h2>Total Activities</h2>
+   <p>{{ total_activities }}</p>
+
+
+   <!-- Summary 1 -->
+   <h2>Activities by Category</h2>
+
+
+   <table border="1">
+       <tr>
+           <th>Category</th>
+           <th>Total</th>
+       </tr>
+
+
+       {% for item in category_summary %}
+       <tr>
+           <td>{{ item.category }}</td>
+           <td>{{ item.total }}</td>
+       </tr>
+       {% empty %}
+       <tr>
+           <td colspan="2">No activities found.</td>
+       </tr>
+       {% endfor %}
+   </table>
+
+
+   <!-- Summary 2 -->
+   <h2>Activities by Name</h2>
+
+
+   <table border="1">
+       <tr>
+           <th>Activity Name</th>
+           <th>Total</th>
+       </tr>
+
+
+       {% for item in activity_summary %}
+       <tr>
+           <td>{{ item.activity_name }}</td>
+           <td>{{ item.total }}</td>
+       </tr>
+       {% empty %}
+       <tr>
+           <td colspan="2">No activities found.</td>
+       </tr>
+       {% endfor %}
+   </table>
+
+
+   <!-- Download buttons -->
+   <h2>Downloads</h2>
+
+
+   <a href="{% url 'activities_csv' %}">
+       <button>Download CSV</button>
+   </a>
+
+
+   <a href="{% url 'activities_json' %}">
+       <button>Download JSON</button>
+   </a>
+
+
+</body>
+</html>
