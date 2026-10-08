@@ -5,8 +5,9 @@ import requests
 import csv
 from datetime import datetime
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from activities.models import Friends, Notifications, Recommendations, Activities
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
@@ -18,7 +19,7 @@ from django.template import loader
 def home(request):
    return render(request, 'home.html')
 
-
+@login_required
 def friends_list(request):
    friends = Friends.objects.all()
    q = ""
@@ -39,7 +40,7 @@ def friends_list(request):
    )
 # view number 1 with render
 
-
+@login_required
 def notifications(request):
    notification = Notifications.objects.all()
    template = loader.get_template("notifications.html")
@@ -49,12 +50,10 @@ def notifications(request):
 # view number 2 with HttpResponse
 
 
-
-
-class Recommendation(ListView):
-   model = Recommendations
-   template_name = "recommendations.html"
-   context_object_name = "recommendations"
+class Recommendation(LoginRequiredMixin, ListView):
+    model = Recommendations
+    template_name = "recommendations.html"
+    context_object_name = "recommendations"
 
 
 # api url
@@ -67,6 +66,8 @@ VALID_TYPES = {"education", "recreational", "social", "diy", "charity",
 
 
 # the API's price is a relative score: 0 is free, higher is more expensive
+@login_required
+
 def price_label(p):
    if p is None:
        return "Unknown"
@@ -80,7 +81,7 @@ def price_label(p):
 
 
 
-
+@login_required
 def recommend_activity(request):
    q = request.GET.get("q", "")
    if not q:
@@ -220,17 +221,17 @@ class Hobbies(View):
 from django.views.generic import DetailView
 
 
-class ActivityDetail(DetailView):
+class ActivityDetail(LoginRequiredMixin, DetailView):
    model = Activities
    template_name = "activity_detail.html"
 
 
-class FriendDetail(DetailView):
+class FriendDetail(LoginRequiredMixin, DetailView):
    model = Friends
    template_name = "friend_detail.html"
 
 
-class NotificationDetail(DetailView):
+class NotificationDetail(LoginRequiredMixin, DetailView):
    model = Notifications
    template_name = "notifcation_detail.html"
 
@@ -241,7 +242,7 @@ import matplotlib.pyplot as plt
 from django.db.models import Count
 import io
 
-
+@login_required
 def stats_chart(request):
    category_counts = Activities.objects.values('category').annotate(total=Count('activity_id')).order_by('-total')
 
@@ -268,11 +269,11 @@ def stats_chart(request):
 
 
 
-
+@login_required
 def stats(request):
    return render(request, 'stats.html')
 
-
+@login_required
 def activities_csv(request):
    activities = Activities.objects.all().order_by("activity_name")
 
@@ -302,7 +303,7 @@ def activities_csv(request):
 
    return response
 
-
+@login_required
 def activities_json(request):
    activities = Activities.objects.all().order_by("activity_name")
 
@@ -337,7 +338,7 @@ def activities_json(request):
 
    return response
 
-
+@login_required
 def reports(request):
    activities = Activities.objects.all().order_by("activity_name")
 
@@ -370,5 +371,39 @@ def reports(request):
            "total_activities": activities.count(),
        },
    )
+
+
+
+from django.contrib.auth import login
+from .forms import CreateUser
+
+def signup_view(request):
+    """
+    Show a sign-up form (GET),
+    create an account (POST),
+    then log the user in automatically.
+    """
+    if request.method == "POST":
+        form = CreateUser(request.POST)
+        if form.is_valid():
+            # 1. Create the user in auth_user table
+            new_user = form.save()
+
+            # 2. Log them in immediately (no separate login step)
+            login(request, new_user)
+
+            # 3. Send them somewhere in the app
+            return redirect("home")
+    else:
+        form = CreateUser()
+
+    return render(request, "signup.html", {"form": form})
+
+
+
+@login_required
+def redirect_root_view(request):
+    return redirect("notifications")
+
 
 

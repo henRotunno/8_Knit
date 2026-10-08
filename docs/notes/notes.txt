@@ -66,3 +66,7 @@ Both Vega-Lite specifications load data through API URLs rather than inline data
 The charts are embedded on /vega-lite/ and chart outputs are also available through:
 - /vega-lite/chart1.png
 - /vega-lite/chart2.png
+
+
+8 October 2026: Added internal login/signup pages.
+    -Protected vulnerable links by require login.

@@ -128,3 +128,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_DIRS = [BASE_DIR / "Knit_Application/Knit_Application/ui-ux/static"]
 STATIC_ROOT = BASE_DIR / "Knit_Application/ui-ux/staticfiles"
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+
+
+LOGIN_URL = "login_urlpattern"        # where to send people if not logged in
+
+# Where the users are directed after login
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login_urlpattern'

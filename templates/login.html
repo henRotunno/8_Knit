@@ -1,0 +1,42 @@
+<!-- Paste code here: templates/students/login.html -->
+<!-- new addition/changes: added the signup button -->
+
+
+
+{% block title %}
+  Login
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4" style="max-width: 400px;">
+    <h2 class="mb-3 text-center">Login</h2>
+
+    <!-- Display form errors (if any) -->
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        Please correct the errors below.
+      </div>
+    {% endif %}
+
+    <!-- Login form -->
+    <form method="POST" class="card p-3 shadow-sm">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <!-- Submit button -->
+      <div class="d-grid mt-3">
+        <button type="submit" class="btn btn-primary">Login</button>
+      </div>
+    </form>
+
+  <p class="text-center mt-3">
+        Don’t have an account?
+        <a href="{% url 'signup_urlpattern' %}" class="text-decoration-none">
+            Sign Up
+        </a>
+    </p>
+
+
+  </div>
+
+{% endblock %}
