@@ -10,18 +10,25 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+# ================================================================================================
+# 0) CORE IMPORTS
+# ================================================================================================
+
 from pathlib import Path
 from Knit_Application.secret_environments import env
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# ================================================================================================
+# 1) BASE DIRECTORY
+# ================================================================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # added third parent for updated path
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# ================================================================================================
+# 2) SECURITY SETTINGS
+# ================================================================================================
 
 SECRET_KEY = env('SECRET_KEY') # need to import secret_environments file
 
@@ -30,8 +37,16 @@ SECRET_KEY = env('SECRET_KEY') # need to import secret_environments file
 
 ALLOWED_HOSTS = []
 
+# ================================================================================================
+# 3) SITE_ID  (NEW CHANGES)
+# ================================================================================================
 
-# Application definition
+SITE_ID = 1
+
+# ================================================================================================
+# 4) APPLICATION DEFINITION (NEW CHANGES)
+# ================================================================================================
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -41,9 +56,30 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "activities",
+
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
+# ================================================================================================
+# 5) Authentication Backends  (NEW CHANGES)
+# ================================================================================================
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# ================================================================================================
+# 6) MIDDLEWARE (NEW CHANGES)
+# ================================================================================================
+
 MIDDLEWARE = [
+    'allauth.account.middleware.AccountMiddleware',  # New Changes/Addition
+
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -53,7 +89,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ================================================================================================
+# 7) URL CONFIGURATION
+# ================================================================================================
+
+
 ROOT_URLCONF = "Knit_Application.urls"
+
+# ================================================================================================
+# 7) template CONFIGURATION
+# ================================================================================================
+
 
 TEMPLATES = [
     {
@@ -71,6 +117,11 @@ TEMPLATES = [
     },
 ]
 
+# ================================================================================================
+# 9) WSGI
+# ================================================================================================
+
+
 WSGI_APPLICATION = "Knit_Application.wsgi.application"
 
 
@@ -84,9 +135,9 @@ DATABASES = {
     } # updated path for sqlite, in data folder
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# ================================================================================================
+# 10) PASSWORD VALIDATION
+# ================================================================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -103,9 +154,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# ================================================================================================
+# 11) INTERNATIONALIZATION
+# ================================================================================================
 
 LANGUAGE_CODE = "en-us"
 
@@ -114,6 +165,17 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+# ================================================================================================
+# 12) DEFAULT PRIMARY KEY FIELD TYPE
+# ================================================================================================
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# ================================================================================================
+# 13) STATIC FILES CONFIGURATION
+# ================================================================================================
 
 
 # Static files (CSS, JavaScript, Images)
@@ -124,11 +186,13 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATICFILES_DIRS = [BASE_DIR / "Knit_Application/Knit_Application/ui-ux/static"]
 STATIC_ROOT = BASE_DIR / "Knit_Application/ui-ux/staticfiles"
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
+# ================================================================================================
+# 14) AUTHENTICATION / LOGIN CONFIGURATION
+# ================================================================================================
 
 
 LOGIN_URL = "login_urlpattern"        # where to send people if not logged in
@@ -136,3 +200,9 @@ LOGIN_URL = "login_urlpattern"        # where to send people if not logged in
 # Where the users are directed after login
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login_urlpattern'
+
+# ================================================================================================
+# 15) GOOGLE LOGIN TEMPLATE (NEW CHANGES)
+# ================================================================================================
+
+SOCIALACCOUNT_LOGIN_ON_GET = True

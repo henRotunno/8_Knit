@@ -70,3 +70,7 @@ The charts are embedded on /vega-lite/ and chart outputs are also available thro
 
 8 October 2026: Added internal login/signup pages.
     -Protected vulnerable links by require login.
+
+    -Established Google OAuth for 127.0.0.1:8000
+        -Cleaned up some code in base.py
+        -Added google button (work in progress, fix the style)

@@ -1,8 +1,9 @@
-<!--Paste in: students/signup.html-->
-<!-- New File -->
 
+{% extends "base.html" %}
 
-
+{% load socialaccount %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 
 {% block title %}Sign up{% endblock %}
@@ -16,6 +17,23 @@
       {{ form.as_p }}
 
       <button type="submit" class="btn btn-success w-100">Create account</button>
+
+
+
+        <!-- ================================ -->
+    <!-- GOOGLE SIGNUP (OAUTH)            -->
+    <!-- ================================ -->
+
+    <div class="d-grid">
+      <a href="{% provider_login_url 'google' %}"
+         class="google-btn text-decoration-none text-center">
+         <img src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google Logo"
+              class="google-icon">
+         Continue with Google
+      </a>
+    </div>
+
     </form>
 
     <p class="mt-3 text-muted">
