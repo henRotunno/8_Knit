@@ -1,3 +1,8 @@
+
+# ================================================================================================
+# 0) Imports
+# ================================================================================================
+
 from django.db.models import Q
 from django.db.models import Count
 from django.http import HttpResponse
@@ -15,9 +20,17 @@ from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 
+# ================================================================================================
+# 1) Home page view
+# ================================================================================================
 
 def home(request):
    return render(request, 'home.html')
+
+# ================================================================================================
+# 2) Friends_list view
+# ================================================================================================
+
 
 @login_required
 def friends_list(request):
@@ -40,6 +53,11 @@ def friends_list(request):
    )
 # view number 1 with render
 
+
+# ================================================================================================
+# 3) Notifications view
+# ================================================================================================
+
 @login_required
 def notifications(request):
    notification = Notifications.objects.all()
@@ -48,6 +66,11 @@ def notifications(request):
    output = template.render(context, request)
    return HttpResponse(output)\
 # view number 2 with HttpResponse
+
+
+# ================================================================================================
+# 4) Recommendations View + External API handling
+# ================================================================================================
 
 
 class Recommendation(LoginRequiredMixin, ListView):
@@ -173,8 +196,9 @@ def recommend_activity(request):
 
 
 
-# generic
-
+# ================================================================================================
+# 5) Activities View
+# ================================================================================================
 
 class Hobbies(LoginRequiredMixin, View):
 
@@ -219,6 +243,9 @@ class Hobbies(LoginRequiredMixin, View):
 # base
 from django.views.generic import DetailView
 
+# ================================================================================================
+# 6) Detail views
+# ================================================================================================
 
 class ActivityDetail(LoginRequiredMixin, DetailView):
    model = Activities
@@ -233,6 +260,11 @@ class FriendDetail(LoginRequiredMixin, DetailView):
 class NotificationDetail(LoginRequiredMixin, DetailView):
    model = Notifications
    template_name = "notifcation_detail.html"
+
+
+# ================================================================================================
+# 7) Stats (Matplotlib)
+# ================================================================================================
 
 
 import matplotlib
@@ -301,6 +333,11 @@ def activities_csv(request):
 
 
    return response
+
+# ================================================================================================
+# 7) JSON handling (activities)
+# ================================================================================================
+
 
 @login_required
 def activities_json(request):
@@ -373,8 +410,14 @@ def reports(request):
 
 
 
+# ================================================================================================
+# 8) Login/Signup handling
+# ================================================================================================
+
 from django.contrib.auth import login
 from .forms import CreateUser
+
+
 
 def signup_view(request):
     """
