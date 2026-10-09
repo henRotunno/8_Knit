@@ -66,7 +66,6 @@ VALID_TYPES = {"education", "recreational", "social", "diy", "charity",
 
 
 # the API's price is a relative score: 0 is free, higher is more expensive
-@login_required
 
 def price_label(p):
    if p is None:

@@ -32,6 +32,8 @@
     >
 </div>
 
+
+
 <!-- authentication -->
 <div>
   <ul class="nav ms-auto">
@@ -61,6 +63,12 @@
             <a href="{% url 'activities' %}">Activities</a>
         </nav>
     </div>
+
+<div style="text-align: center;">
+<a href="{% url 'login_urlpattern' %}" class="btn btn-primary">
+    Login
+</a>
+ </div>
 
 
     {% block send_search %}
