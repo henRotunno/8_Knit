@@ -177,7 +177,7 @@ def recommend_activity(request):
 # generic
 
 
-class Hobbies(View):
+class Hobbies(LoginRequiredMixin, View):
 
 
    def build_response(self, request, q):
