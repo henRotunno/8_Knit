@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",                  # <--- Added for Vega-Lite & public API
     "activities",
 
     'django.contrib.sites',
@@ -63,7 +64,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 ]
-
 # ================================================================================================
 # 5) Authentication Backends  (NEW CHANGES)
 # ================================================================================================
@@ -78,6 +78,7 @@ AUTHENTICATION_BACKENDS = [
 # ================================================================================================
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # New Addition for Assignment 5 Part 3.1
     'allauth.account.middleware.AccountMiddleware',  # New Changes/Addition
 
     "django.middleware.security.SecurityMiddleware",
@@ -206,3 +207,9 @@ LOGOUT_REDIRECT_URL = 'login_urlpattern'
 # ================================================================================================
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# ================================================================================================
+# 16) CORS CONFIGURATION (Required for Public API & Vega-Lite) (NEW CHANGES)
+# ================================================================================================
+
+CORS_ALLOW_ALL_ORIGINS = True
