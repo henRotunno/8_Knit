@@ -2,7 +2,26 @@ import json
 
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count
+from django.contrib.auth.decorators import login_required
 from activities.models import Activities, User
+
+
+# ==========================================
+# PUBLIC API (For Part 3.1 & Vega-Lite 3.2)
+# ==========================================
+def activity_category_summary(request):
+    """
+    PUBLIC endpoint: No login required.
+    Returns clean JSON aggregate of activity categories and counts.
+    """
+    data = list(
+        Activities.objects
+        .values("category")
+        .annotate(count=Count("activity_id"))
+        .order_by("category")
+    )
+
+    return JsonResponse(data, safe=False)
 
 
 def activities_api(request):
@@ -37,17 +56,17 @@ def activities_http_api(request):
         json.dumps(data),
         content_type="text/plain"
     )
-def activity_category_summary(request):
-    data = list(
-        Activities.objects
-        .values("category")
-        .annotate(count=Count("activity_id"))
-        .order_by("category")
-    )
 
-    return JsonResponse(data, safe=False)
 
+# ==========================================
+# PROTECTED API (Demonstrates auth protection)
+# ==========================================
+@login_required
 def user_friend_summary(request):
+    """
+    PROTECTED endpoint: Requires login.
+    Returns sensitive user-specific data.
+    """
     data = list(
         User.objects
         .annotate(friend_count=Count("friendships"))

@@ -185,16 +185,35 @@ h1, h2, h3, h4, h5 {
   }
 }
 
-/*
-Dark mode disabled for now to avoid confusing UI during class
+/* ============================= */
+/* GOOGLE LOGIN BUTTON STYLING  */
+/* ============================= */
 
-@media (prefers-color-scheme: dark) {
-  body { background: #0b1321; color: #e5e7eb; }
-  .site-header { border-bottom-color: #ff7b59; }
-  .card { background: #111827; border-color: #1f2937; }
-  .card__header { border-color: #1f2937; color: #e5e7eb; }
-  a { color: #93c5fd; }
-  .list li { border-color: #1f2937; }
-  .stat-chip { background: #0f172a; border-color: #1f2937; color: #e5e7eb; }
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    background-color: #ffffff;
+    color: #444;
+    border: 1px solid #ddd;
+
+    padding: 10px;
+    border-radius: 5px;
+
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
 }
-*/
+
+.google-btn:hover {
+    background-color: #f7f7f7;
+    border-color: #ccc;
+    color: #000;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+

@@ -18,7 +18,7 @@ Including another URLconf
 
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from activities import views
 from activities.api_views import (
    activities_api,
@@ -29,6 +29,7 @@ from activities.api_views import (
 from django.views.generic import TemplateView
 from django.views.generic import RedirectView
 from django.templatetags.static import static
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 
@@ -98,4 +99,19 @@ urlpatterns = [
    ),
 
 
+    path('login/',
+         LoginView.as_view(template_name='login.html'),
+         name='login_urlpattern'),
+
+
+    path('logout/',
+         LogoutView.as_view(),
+         name='logout_urlpattern'),
+
+    path("signup/", views.signup_view, name="signup_urlpattern"),
+
+    path('accounts/', include('allauth.urls')),
 ]
+
+
+
