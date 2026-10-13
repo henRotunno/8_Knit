@@ -74,3 +74,6 @@ The charts are embedded on /vega-lite/ and chart outputs are also available thro
     -Established Google OAuth for 127.0.0.1:8000
         -Cleaned up some code in base.py
         -Added google button (work in progress, fix the style)
+
+
+13 October 2026: Created the llm-test folder and ai_prototype.ipynb
