@@ -55,20 +55,19 @@
 
 
     <div class="navigation">
-        <nav>
-            <a href="{% url 'home' %}">Home</a>
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+
+        {% if user.is_authenticated %}
             <a href="{% url 'friends' %}">Friends</a>
             <a href="{% url 'notifications' %}">Notifications</a>
             <a href="{% url 'recommendations' %}">Recommendations</a>
             <a href="{% url 'activities' %}">Activities</a>
-        </nav>
-    </div>
-
-<div style="text-align: center;">
-<a href="{% url 'login_urlpattern' %}" class="btn btn-primary">
-    Login
-</a>
- </div>
+        {% else %}
+            <a href="{% url 'login_urlpattern' %}">Login</a>
+        {% endif %}
+    </nav>
+</div>
 
 
     {% block send_search %}

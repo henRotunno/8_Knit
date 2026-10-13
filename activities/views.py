@@ -432,7 +432,11 @@ def signup_view(request):
             new_user = form.save()
 
             # 2. Log them in immediately (no separate login step)
-            login(request, new_user)
+            login(
+                request,
+                new_user,
+                backend="django.contrib.auth.backends.ModelBackend"
+            )
 
             # 3. Send them somewhere in the app
             return redirect("home")
