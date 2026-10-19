@@ -20,12 +20,40 @@ from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 
+from activities.local_llm import generate_local_response
+
 # ================================================================================================
 # 1) Home page view
 # ================================================================================================
 
 def home(request):
    return render(request, 'home.html')
+
+def local_llm_view(request):
+    user_input = ""
+    response_text = ""
+    error = ""
+
+    if request.method == "POST":
+        user_input = request.POST.get("prompt", "").strip()
+
+        if not user_input:
+            error = "Please enter something first."
+        else:
+            try:
+                response_text = generate_local_response(user_input)
+            except Exception as e:
+                error = f"Local model error: {str(e)}"
+
+    return render(
+        request,
+        "local_llm.html",
+        {
+            "user_input": user_input,
+            "response_text": response_text,
+            "error": error,
+        },
+    )
 
 # ================================================================================================
 # 2) Friends_list view
