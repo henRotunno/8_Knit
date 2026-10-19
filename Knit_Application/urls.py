@@ -43,6 +43,7 @@ urlpatterns = [
    path("recommendations/", views.Recommendation.as_view(), name="recommendations"),
    path("activities/", views.Hobbies.as_view(), name="activities"),
    path("", views.home, name="home"),
+   path("local-llm/", views.local_llm_view, name="local_llm"),
    path("activities/<int:pk>/", views.ActivityDetail.as_view(), name="activity-detail"),
    path("friends/<int:pk>/", views.FriendDetail.as_view(), name="friend-detail"),
    path("notifications/<int:pk>/", views.NotificationDetail.as_view(), name="notification-detail"),
