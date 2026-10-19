@@ -19,6 +19,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from .hybrid_pipeline import run_hybrid_pipeline
 
 from activities.local_llm import generate_local_response
 
@@ -479,5 +480,23 @@ def signup_view(request):
 def redirect_root_view(request):
     return redirect("notifications")
 
+# ================================================================================================
+# 9) AI Hybrid Pipeline
+# ================================================================================================
 
+@login_required
+def hybrid_ai_view(request):
+    """
+    Renders the hybrid AI UI on GET, and executes the pipeline on POST.
+    Stage 1: Local Hugging Face model acts as a pre-filter/guardrail.
+    Stage 2: External Groq cloud API generates refined text.
+    """
+    context = {}
+    if request.method == "POST":
+        user_text = request.POST.get("user_text", "")
+        result = run_hybrid_pipeline(user_text)
+        context["result"] = result
+        context["user_text"] = user_text
+
+    return render(request, "hybrid_ai.html", context)
 
