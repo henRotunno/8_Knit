@@ -47,6 +47,7 @@ urlpatterns = [
    path("friends/<int:pk>/", views.FriendDetail.as_view(), name="friend-detail"),
    path("notifications/<int:pk>/", views.NotificationDetail.as_view(), name="notification-detail"),
    path("reports/", views.reports, name="reports"),
+   path("hybrid-ai/", views.hybrid_ai_view, name="hybrid_ai"),
    path("api/activities/", activities_api, name="activities_api"),
    path("api/activities-http/", activities_http_api, name="activities_http_api"),
    path("stats-chart/", views.stats_chart, name="stats-chart"),
