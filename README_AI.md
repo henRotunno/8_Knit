@@ -23,3 +23,13 @@ Our implementation utilizes a multi-layered defense strategy spanning input scre
   * Submissions that successfully pass the local guardrail are forwarded to the Groq Cloud Inference API running an open-weight LLM (`qwen/qwen3.8-27b`).
   * **System Instruction Sandboxing:** Strict system instructions enforce role adherence ("You are an intelligent text refinement assistant..."), constraining the model to structured text rewriting and preventing prompt injection drift.
   * **Fault Tolerance & Broken Output Handling:** External API network calls are encapsulated in strict `try/except` blocks. If the external provider experiences network latency, rate limits (HTTP 429), or missing resources (HTTP 404), the exception is caught gracefully. Instead of raising an unhandled HTTP 500 error that crashes the Django server, the view returns a structured `partial_success` status payload containing the local analysis alongside an explicit error description for user visibility.
+
+### 4. Local LLM Integration
+
+In addition to the hybrid API pipeline, the application includes a fully local Hugging Face LLM integration using `Qwen/Qwen2.5-1.5B-Instruct`, which was selected based on the Part 1 model evaluation.
+
+The model is loaded through the Hugging Face `transformers` library and runs locally on the application machine using PyTorch. The model weights are downloaded automatically from Hugging Face the first time the feature is used and are not stored in the Git repository.
+
+Users can access the local model through the `/local-llm/` Django route. The page accepts a natural-language description of the type of weekend activity the user is interested in. The Django view passes the input to the local Qwen model, which generates personalized activity recommendations and returns the result to the webpage.
+
+The model is loaded once and cached for reuse so that it does not need to be reloaded for every request. User input is stripped of unnecessary whitespace before inference, and empty input is rejected before being sent to the model.
