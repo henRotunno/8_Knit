@@ -53,7 +53,7 @@ def generate_local_response(user_input: str) -> str:
 
     result = generator(
         messages,
-        max_new_tokens=120,
+        max_new_tokens=40,
         do_sample=False,
     )
 
