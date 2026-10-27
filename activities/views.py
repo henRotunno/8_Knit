@@ -19,6 +19,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+
 from .hybrid_pipeline import run_hybrid_pipeline
 
 from activities.local_llm import generate_local_response
