@@ -70,3 +70,7 @@ typing-inspection==0.4.4
 urllib3==2.8.0
 wcwidth==0.8.2
 wheel==0.47.0
+
+# A9 local GGUF backend (existing application dependencies above are preserved)
+huggingface-hub==2.2.0
+llama-cpp-python==0.3.19

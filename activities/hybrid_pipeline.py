@@ -1,18 +1,15 @@
 import os
-from transformers import pipeline
-from groq import Groq
-from dotenv import load_dotenv
+from functools import lru_cache
 
-load_dotenv()
 
-# Initialize External API client
-groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+@lru_cache(maxsize=1)
+def get_classifier():
+    from transformers import pipeline
 
-# Initialize Local Hugging Face Model (guardrail / filter)
-local_classifier = pipeline(
-    "text-classification",
-    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
-)
+    return pipeline(
+        "text-classification",
+        model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
+    )
 
 
 def run_hybrid_pipeline(user_input: str) -> dict:
@@ -23,9 +20,13 @@ def run_hybrid_pipeline(user_input: str) -> dict:
     if len(cleaned_text) > 2000:
         return {"status": "error", "message": "Input exceeds 2000 character limit."}
 
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return {"status": "error", "message": "The optional hosted feature requires a Groq API key."}
+
     # Stage 1: Local Pre-filter Guardrail
     try:
-        local_result = local_classifier(cleaned_text[:512])[0]
+        local_result = get_classifier()(cleaned_text, truncation=True, max_length=512)[0]
         label = local_result.get("label")
         score = local_result.get("score", 0.0)
     except Exception as e:
@@ -35,11 +36,14 @@ def run_hybrid_pipeline(user_input: str) -> dict:
         return {
             "status": "rejected",
             "local_analysis": {"label": label, "confidence": round(score, 3)},
-            "api_output": "Processing halted: Input flagged by local filter as toxic or excessively negative."
+            "api_output": "Processing halted: Input flagged by local filter as strongly negative in sentiment."
         }
 
     # Stage 2: External Groq Cloud Generation
     try:
+        from groq import Groq
+
+        groq_client = Groq(api_key=api_key, timeout=15.0, max_retries=0)
         completion = groq_client.chat.completions.create(
             model="qwen/qwen3.8-27b",
             messages=[
