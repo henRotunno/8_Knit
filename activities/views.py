@@ -20,9 +20,8 @@ from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 
-from .hybrid_pipeline import run_hybrid_pipeline
-
-from activities.local_llm import generate_local_response
+from .forms import ActivityPromptForm
+from .local_llm import RecommendationUnavailable, recommend_activities
 
 # ================================================================================================
 # 1) Home page view
@@ -32,30 +31,17 @@ def home(request):
    return render(request, 'home.html')
 
 def local_llm_view(request):
-    user_input = ""
-    response_text = ""
-    error = ""
+    form = ActivityPromptForm(request.POST if request.method == "POST" else None)
+    context = {"form": form}
+    if request.method == "POST" and form.is_valid():
+        try:
+            context["response_text"], context["sources"] = recommend_activities(
+                form.cleaned_data["prompt"]
+            )
+        except RecommendationUnavailable as exc:
+            context["error"] = str(exc)
 
-    if request.method == "POST":
-        user_input = request.POST.get("prompt", "").strip()
-
-        if not user_input:
-            error = "Please enter something first."
-        else:
-            try:
-                response_text = generate_local_response(user_input)
-            except Exception as e:
-                error = f"Local model error: {str(e)}"
-
-    return render(
-        request,
-        "local_llm.html",
-        {
-            "user_input": user_input,
-            "response_text": response_text,
-            "error": error,
-        },
-    )
+    return render(request, "local_llm.html", context)
 
 # ================================================================================================
 # 2) Friends_list view
@@ -494,6 +480,8 @@ def hybrid_ai_view(request):
     """
     context = {}
     if request.method == "POST":
+        from .hybrid_pipeline import run_hybrid_pipeline
+
         user_text = request.POST.get("user_text", "")
         result = run_hybrid_pipeline(user_text)
         context["result"] = result

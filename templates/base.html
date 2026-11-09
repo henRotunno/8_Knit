@@ -57,6 +57,7 @@
     <div class="navigation">
     <nav>
         <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'local_llm' %}">AI Activity Suggestions</a>
 
         {% if user.is_authenticated %}
             <a href="{% url 'friends' %}">Friends</a>

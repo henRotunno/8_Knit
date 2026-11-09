@@ -6,6 +6,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from .local_llm import MAX_PROMPT_LENGTH
+
 # 	UserCreationForm is a built-in Django form that already does password validation.
 # 	We’re extending it to include email.
 class CreateUser(UserCreationForm):
@@ -28,3 +30,16 @@ class CreateUser(UserCreationForm):
         # This is a pre-existing table in Django where we are already storing our internal user's data
         model = User
         fields = ["username", "email", "password1", "password2"]
+
+
+class ActivityPromptForm(forms.Form):
+    prompt = forms.CharField(
+        label="What would you like to do?",
+        max_length=MAX_PROMPT_LENGTH,
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "rows": 4,
+            "placeholder": "Example: How should my friends and I prepare for our first hike?",
+        }),
+        error_messages={"required": "Please describe the activity you’re looking for."},
+    )
