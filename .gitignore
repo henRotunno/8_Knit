@@ -9,4 +9,6 @@ staticfiles/
 client_secret_*.json
 *.bin
 *.safetensors
-*.pt
+*.pt.DS_Store
+*.zip
+.idea/
