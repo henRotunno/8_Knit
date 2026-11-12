@@ -1,5 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <style>
+    .title {
+        text-align: center;
+        padding-top: 20px;
+    }
+
+    </style>
+<body>
+
+<div class="title">
   <h2>{{ object.activity_name }}</h2>
+
+    <p>
+        No current activities in your area, consider starting one!
+    </p>
+
+    <div style="margin-top: 32px;">
+    <h3>Start an Activity</h3>
+    <form method="POST" class="row-form" style="margin-top: 0;">
+      {% csrf_token %}
+      <input type="text" name="name" placeholder="Start time (ex: 7:00 P.M)" required>
+        <input type="text" name="name" placeholder="End time (ex: 9:00 P.M)" required>
+        <input type="text" name="name" placeholder="Meeting Location" required>
+
+
+
+        <button type="submit" class="btn btn-primary">Add Activity</button>
+    </form>
+  </div>
+</div>
+
+    </body>
 {% endblock %}

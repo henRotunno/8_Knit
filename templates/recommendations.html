@@ -9,34 +9,36 @@
 <!-- Block: Content -->
 
 {% block content %}
-  <div class="d-flex align-items-center justify-content-between mt-3">
-    <h2 style="text-align:center;" class="mb-0">Recommendations</h2>
+  <div class="container text-center mt-3">
+
+    <h2 class="mb-3">Recommendations</h2>
+    <h2 class="mb-3">Find an activity</h2>
+
+    <!-- Controls -->
+    <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap mb-3">
+      <select id="type" class="form-select w-auto">
+        <option>education</option><option>recreational</option><option>social</option>
+        <option>diy</option><option>charity</option><option>cooking</option>
+        <option>relaxation</option><option>music</option><option>busywork</option>
+      </select>
+
+      <select id="participants" class="form-select w-auto">
+        <option value="">Any number of people</option>
+        <option value="1">Just me</option>
+        <option value="2">2 people</option>
+        <option value="3">3 people</option>
+        <option value="4">4 people</option>
+      </select>
+
+      <button id="search" class="btn btn-primary">Search</button>
+    </div>
+
+    <p id="status"></p>
+    <ul id="results" class="list-unstyled"></ul>
+
   </div>
 
-    <h2 style="text-align:center;">Find an activity</h2>
 
-
-    <!-- Keys for the bored api -->
-<select id="type">
-  <option>education</option><option>recreational</option><option>social</option>
-  <option>diy</option><option>charity</option><option>cooking</option>
-  <option>relaxation</option><option>music</option><option>busywork</option>
-</select>
-
-<select id="participants">
-  <option value="">Any number of people</option>
-  <option value="1">Just me</option>
-  <option value="2">2 people</option>
-  <option value="3">3 people</option>
-  <option value="4">4 people</option>
-</select>
-    <!-- The user can enter the amount of participants for the activity
-     Note: This is mainly a tool for the user to think of what they might want to do
-     on the activity page. This is the api's parameters, helps prevent 404s that i kept running into-->
-<button id="search">Search</button>
-
-<p id="status"></p>
-<ul id="results"></ul>
     <script>
 document.getElementById("search").addEventListener("click", async () => {
   const status = document.getElementById("status");

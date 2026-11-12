@@ -6,95 +6,101 @@
 
 {% block content %}
 
-<div class="d-flex align-items-center justify-content-between mt-3">
-    <h2 style="text-align:center;" class="mb-0">Activities</h2>
-</div>
+<style>
+  .page {
+    max-width: 600px;
+    margin: 24px auto;
+    padding: 0 16px;
+    text-align: center;
+  }
 
-    <div class="activity-summary" style="text-align:center;">
-  <p>Total activities: {{ total_activities }}</p>
-  <ul>
-    {% for row in activities_per_category %}
-      <li>{{ row.category|default:"Uncategorized" }}: {{ row.total }}</li>
-    {% endfor %}
-  </ul>
-</div>
+  .page h2 { margin-bottom: 8px; }
+  .page h3 { margin: 0 0 12px; }
 
+  .summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-<!-- GET FORM: Search -->
-<form style="text-align:center;"
-      method="get"
-      class="row g-2 align-items-center mt-4">
+  .row-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
 
-    <div class="col-12 col-sm-6 col-md-4">
-        <input type="search"
-               name="q"
-               value="{{ q }}"
-               class="form-control"
-               placeholder="Search by activity:">
-    </div>
+  .row-form input {
+    padding: 6px 10px;
+    min-width: 240px;
+  }
 
-    <div class="col-auto">
-        <button class="btn btn-primary" type="submit">
-            Search
-        </button>
+  .card-box {
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left;
+  }
 
-        {% if q %}
-            <a class="btn btn-outline-secondary ms-2"
-               href="{% url 'activities' %}">
-                Clear
-            </a>
-        {% endif %}
-    </div>
+  .card-box ul {
+    margin: 0;
+    padding-left: 20px;
+  }
 
-</form>
+  .card-box li { margin-bottom: 4px; }
+  .muted { color: #6c757d; }
+</style>
 
+<div class="page">
+
+  <h2>Activities</h2>
+
+  <!-- Summary -->
+  <div class="summary">
+    <p>Total activities: {{ total_activities }}</p>
+    <ul>
+      {% for row in activities_per_category %}
+        <li>{{ row.category|default:"Uncategorized" }}: {{ row.total }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- GET FORM: Search -->
+  <form method="get" class="row-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search by activity:">
+    <button class="btn btn-primary" type="submit">Search</button>
+    {% if q %}
+      <a class="btn btn-outline-secondary" href="{% url 'activities' %}">Clear</a>
+    {% endif %}
+  </form>
+
+  <!-- Activity List -->
+  <div class="card-box">
+    <ul>
+      {% for act in Activities %}
+        <li><a href="{{ act.get_absolute_url }}">{{ act }}</a></li>
+      {% empty %}
+        <li class="muted">Hobby Hub</li>
+      {% endfor %}
+    </ul>
+  </div>
 
 <!-- POST FORM: Create Activity -->
-<div class="mt-4">
-
-    <h3>Create an Activity</h3>
-
-    <form method="POST">
-        {% csrf_token %}
-
-        <input type="text"
-               name="name"
-               placeholder="Activity name"
-               required>
-
-        <button type="submit" class="btn btn-primary">
-            Add Activity
-        </button>
+  <div style="margin-top: 32px;">
+    <h3>Add an Activity</h3>
+      <p>
+          Don't see an activtiy you like? add it!
+      </p>
+    <form method="POST" class="row-form" style="margin-top: 0;">
+      {% csrf_token %}
+      <input type="text" name="name" placeholder="Activity name" required>
+      <button type="submit" class="btn btn-primary">Add Activity</button>
     </form>
+  </div>
 
-</div>
-
-
-<!-- Activity List -->
-<div class="card mt-3">
-    <div class="card-body p-3">
-
-        <ul class="mb-0">
-
-            {% for act in Activities %}
-
-                <li class="mb-1">
-                    <a href="{{ act.get_absolute_url }}">
-                        {{ act }}
-                    </a>
-                </li>
-
-            {% empty %}
-
-                <li class="text-muted">
-                    Hobby Hub
-                </li>
-
-            {% endfor %}
-
-        </ul>
-
-    </div>
 </div>
 
 {% endblock %}
