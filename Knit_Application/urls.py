@@ -113,7 +113,10 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup_urlpattern"),
 
     path('accounts/', include('allauth.urls')),
+
+    path("activity/<int:pk>/favorite/", views.toggle_favorite, name="toggle_favorite"),
 ]
+
 
 
 

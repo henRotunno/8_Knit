@@ -1,36 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <!---- style tag in html file because i like doing it  ---->
     <style>
     .title {
         text-align: center;
         padding-top: 20px;
     }
-
+    .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .fav-btn {
+        background: none;
+        border: none;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+        color: #e84a27;
+    }
     </style>
-<body>
 
 <div class="title">
-  <h2>{{ object.activity_name }}</h2>
+  <div class="title-row">
+    <h2 style="margin: 0;">{{ object.activity_name }}</h2>
 
-    <p>
-        No current activities in your area, consider starting one!
-    </p>
+    {% if user.is_authenticated %}
+      <form method="POST" action="{% url 'toggle_favorite' object.pk %}" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" class="fav-btn"
+                title="{% if user in object.favorited_by.all %}Remove from favorites{% else %}Add to favorites{% endif %}">
+          {% if user in object.favorited_by.all %}★{% else %}☆{% endif %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
 
-    <div style="margin-top: 32px;">
+  <p>
+      No current activities in your area, consider starting one!
+  </p>
+
+  <div style="margin-top: 32px;">
     <h3>Start an Activity</h3>
     <form method="POST" class="row-form" style="margin-top: 0;">
       {% csrf_token %}
-      <input type="text" name="name" placeholder="Start time (ex: 7:00 P.M)" required>
-        <input type="text" name="name" placeholder="End time (ex: 9:00 P.M)" required>
-        <input type="text" name="name" placeholder="Meeting Location" required>
+      <input type="text" name="start_time" placeholder="Start time (ex: 7:00 P.M)" required>
+      <input type="text" name="end_time" placeholder="End time (ex: 9:00 P.M)" required>
+      <input type="text" name="location" placeholder="Meeting Location" required>
 
-
-
-        <button type="submit" class="btn btn-primary">Add Activity</button>
+      <button type="submit" class="btn btn-primary">Add Activity</button>
     </form>
   </div>
 </div>
-
-    </body>
 {% endblock %}

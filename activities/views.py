@@ -22,7 +22,7 @@ from django.template import loader
 
 from .forms import ActivityPromptForm
 from .local_llm import RecommendationUnavailable, recommend_activities
-
+from .models import Activities
 # ================================================================================================
 # 1) Home page view
 # ================================================================================================
@@ -488,4 +488,19 @@ def hybrid_ai_view(request):
         context["user_text"] = user_text
 
     return render(request, "hybrid_ai.html", context)
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def toggle_favorite(request, pk):
+    activity = get_object_or_404(Activities, pk=pk)
+    if request.user in activity.favorited_by.all():
+        activity.favorited_by.remove(request.user)
+    else:
+        activity.favorited_by.add(request.user)
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 

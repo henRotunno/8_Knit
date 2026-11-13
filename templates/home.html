@@ -1,14 +1,52 @@
 {% extends "base.html" %}
 
-
 {% block content %}
-    <h1 style="text-align: center;">
-        Knit
-    </h1>
+    <h1 style="text-align: center;">Knit</h1>
 
-    <h4 style="text-align: center; padding-bottom:60px;" >
+    <h4 style="text-align: center; padding-bottom:60px;">
         Unravel Your Weekend!
     </h4>
 
+    <h5 style="text-align:center;">
+        {% if user.is_authenticated %}
+            Hello, {{ user.first_name|default:user.username }}, what are you feeling right now?
+        {% else %}
+            Hello! <a href="{% url 'login' %}">Log in</a> or <a href="{% url 'signup_urlpattern' %}">sign up</a> to get started.
+        {% endif %}
+    </h5>
 
+    {% if user.is_authenticated %}
+      {% with favs=user.favorite_activities.all %}
+        <div style="max-width: 400px; margin: 32px auto; text-align: center;">
+          <h3>Your Favorites</h3>
+
+          {% if favs %}
+            <ul style="list-style: none; padding: 0;">
+              {% for activity in favs|slice:":3" %}
+                <li style="padding: 6px 0;">
+                  <a href="/activities/{{ activity.pk }}/">{{ activity.activity_name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+
+            {% if favs|length > 3 %}
+              <details>
+                <summary style="cursor: pointer; color: #e84a27; font-weight: bold;">
+                  Show {{ favs|length|add:"-3" }} more
+                </summary>
+                <ul style="list-style: none; padding: 0;">
+                  {% for activity in favs|slice:"3:" %}
+                    <li style="padding: 6px 0;">
+                      <a href="/activities/{{ activity.pk }}/">{{ activity.activity_name }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            {% endif %}
+          {% else %}
+            <p>No favorites yet. Tap the "☆" on an activity to add one!</p>
+          {% endif %}
+        </div>
+      {% endwith %}
+    {% endif %}
 {% endblock %}
