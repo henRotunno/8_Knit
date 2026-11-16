@@ -1,9 +1,11 @@
 from unittest.mock import patch
 
-from django.test import Client, SimpleTestCase
+from django.contrib.auth import get_user_model
+from django.test import Client, SimpleTestCase, TestCase
 from django.urls import reverse
 
 from .local_llm import MAX_PROMPT_LENGTH
+from .models import Activities
 
 
 class ActivityAIViewTests(SimpleTestCase):
@@ -75,3 +77,65 @@ class ActivityAIViewTests(SimpleTestCase):
         response = self.client.post(self.url, {"prompt": "First hike"})
         self.assertContains(response, "took too long")
         self.assertNotContains(response, "Partial advice")
+
+
+class MostFavoritedActivitiesTests(TestCase):
+    def setUp(self):
+        self.url = reverse("most_favorited_activities")
+
+    def test_public_endpoint_counts_favorites_and_orders_ties_by_name(self):
+        first_user = get_user_model().objects.create_user(username="first")
+        second_user = get_user_model().objects.create_user(username="second")
+        chess = Activities.objects.create(activity_name="Chess")
+        hiking = Activities.objects.create(activity_name="Hiking")
+        art = Activities.objects.create(activity_name="Art")
+        Activities.objects.create(activity_name="Board games")
+        chess.favorited_by.add(first_user)
+        hiking.favorited_by.add(first_user, second_user)
+        art.favorited_by.add(second_user)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertEqual(response.json(), [
+            {"activity_name": "Hiking", "favorite_count": 2},
+            {"activity_name": "Art", "favorite_count": 1},
+            {"activity_name": "Chess", "favorite_count": 1},
+            {"activity_name": "Board games", "favorite_count": 0},
+        ])
+
+    def test_empty_database_returns_an_empty_list(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_counts_follow_favorite_changes_without_counting_duplicate_adds(self):
+        user = get_user_model().objects.create_user(username="reader")
+        activity = Activities.objects.create(activity_name="Reading")
+        self.assertEqual(self.client.get(self.url).json(), [
+            {"activity_name": "Reading", "favorite_count": 0},
+        ])
+
+        activity.favorited_by.add(user)
+        activity.favorited_by.add(user)
+        self.assertEqual(self.client.get(self.url).json(), [
+            {"activity_name": "Reading", "favorite_count": 1},
+        ])
+
+        activity.favorited_by.remove(user)
+        self.assertEqual(self.client.get(self.url).json(), [
+            {"activity_name": "Reading", "favorite_count": 0},
+        ])
+
+    def test_dashboard_keeps_existing_charts_and_adds_favorites_widget(self):
+        response = self.client.get(reverse("vega-charts"))
+
+        self.assertTemplateUsed(response, "vega_charts.html")
+        self.assertContains(response, 'id="activity-category-chart"')
+        self.assertContains(response, 'id="user-friends-chart"')
+        self.assertContains(response, 'id="most-favorited-activities-chart"')
+        self.assertContains(response, "User Behavior")
+        self.assertContains(response, "Most Favorited Activities")
+        self.assertContains(response, self.url)

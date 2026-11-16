@@ -24,6 +24,18 @@ def activity_category_summary(request):
     return JsonResponse(data, safe=False)
 
 
+def most_favorited_activities(request):
+    """Return public activity favorite counts, highest first."""
+    data = list(
+        Activities.objects
+        .annotate(favorite_count=Count("favorited_by"))
+        .values("activity_name", "favorite_count")
+        .order_by("-favorite_count", "activity_name")
+    )
+
+    return JsonResponse(data, safe=False)
+
+
 def activities_api(request):
     query = request.GET.get("q", "")
 

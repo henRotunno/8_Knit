@@ -24,6 +24,7 @@ from activities.api_views import (
    activities_api,
    activities_http_api,
    activity_category_summary,
+   most_favorited_activities,
    user_friend_summary
 )
 from django.views.generic import TemplateView
@@ -58,6 +59,11 @@ urlpatterns = [
         "api/chart/activity-categories/",
         activity_category_summary,
         name="activity_category_summary",
+       ),
+   path(
+        "api/chart/most-favorited-activities/",
+        most_favorited_activities,
+        name="most_favorited_activities",
        ),
    path(
         "api/chart/user-friends/",
