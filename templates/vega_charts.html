@@ -13,6 +13,15 @@
 
     <div id="user-friends-chart"></div>
 
+    <hr>
+
+    <section aria-labelledby="user-behavior-title">
+        <h2 id="user-behavior-title">User Behavior</h2>
+        <h3>Most Favorited Activities</h3>
+        <p id="most-favorited-activities-status" role="status">Loading favorite counts...</p>
+        <div id="most-favorited-activities-chart"></div>
+    </section>
+
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -27,6 +36,56 @@
             "#user-friends-chart",
             "{% static 'vega/user_friends_scatter.json' %}"
         ).catch(console.error);
+
+        const favoritesStatus = document.getElementById("most-favorited-activities-status");
+        fetch("{% url 'most_favorited_activities' %}")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Could not load favorite counts.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.some(activity => activity.favorite_count > 0)) {
+                    favoritesStatus.textContent = "No activities have been favorited yet.";
+                    return;
+                }
+
+                return vegaEmbed("#most-favorited-activities-chart", {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "description": "Activities ranked by the number of users who favorited them.",
+                    "width": 500,
+                    "height": {"step": 28},
+                    "data": {"values": data},
+                    "mark": "bar",
+                    "encoding": {
+                        "x": {
+                            "field": "favorite_count",
+                            "type": "quantitative",
+                            "title": "Favorites",
+                            "scale": {"zero": true},
+                            "axis": {"tickMinStep": 1, "format": "d"}
+                        },
+                        "y": {
+                            "field": "activity_name",
+                            "type": "nominal",
+                            "title": "Activity",
+                            "sort": null,
+                            "axis": {"labelLimit": 300}
+                        },
+                        "tooltip": [
+                            {"field": "activity_name", "type": "nominal", "title": "Activity"},
+                            {"field": "favorite_count", "type": "quantitative", "title": "Favorites", "format": "d"}
+                        ]
+                    }
+                }).then(() => {
+                    favoritesStatus.textContent = "";
+                });
+            })
+            .catch(error => {
+                favoritesStatus.textContent = "Unable to load favorite counts. Please try again later.";
+                console.error(error);
+            });
     </script>
 
 {% endblock %}
