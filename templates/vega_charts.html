@@ -22,6 +22,40 @@
         <div id="most-favorited-activities-chart"></div>
     </section>
 
+    <hr>
+
+    <section aria-labelledby="system-performance-title">
+        <h2 id="system-performance-title">System Performance</h2>
+        <h3>Server Status &amp; Resource Utilization</h3>
+        <p id="server-status-message" role="status">Loading server metrics...</p>
+
+        <!-- Summary Metric Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; max-width: 650px; margin: 16px 0 24px 0;">
+            <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa; text-align: center;">
+                <div style="font-size: 12px; color: #555;">Status</div>
+                <div id="server-health-metric" style="font-size: 18px; font-weight: bold; margin-top: 4px;">--</div>
+            </div>
+            <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa; text-align: center;">
+                <div style="font-size: 12px; color: #555;">CPU Usage</div>
+                <div id="cpu-metric" style="font-size: 18px; font-weight: bold; margin-top: 4px;">--%</div>
+            </div>
+            <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa; text-align: center;">
+                <div style="font-size: 12px; color: #555;">RAM Usage</div>
+                <div id="ram-metric" style="font-size: 18px; font-weight: bold; margin-top: 4px;">--%</div>
+            </div>
+            <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa; text-align: center;">
+                <div style="font-size: 12px; color: #555;">Disk Space</div>
+                <div id="disk-metric" style="font-size: 18px; font-weight: bold; margin-top: 4px;">--%</div>
+            </div>
+            <div style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa; text-align: center;">
+                <div style="font-size: 12px; color: #555;">Uptime</div>
+                <div id="uptime-metric" style="font-size: 18px; font-weight: bold; margin-top: 4px;">--</div>
+            </div>
+        </div>
+
+        <div id="server-status-chart"></div>
+    </section>
+
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -84,6 +118,66 @@
             })
             .catch(error => {
                 favoritesStatus.textContent = "Unable to load favorite counts. Please try again later.";
+                console.error(error);
+            });
+
+        // System Performance: Server Status Widget
+        const serverStatusMessage = document.getElementById("server-status-message");
+        fetch("{% url 'server_status_api' %}")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Could not load server metrics.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                const healthEl = document.getElementById("server-health-metric");
+                healthEl.textContent = data.status;
+                healthEl.style.color = data.status === "Healthy" ? "#137333" : "#c5221f";
+
+                document.getElementById("uptime-metric").textContent = data.uptime;
+                document.getElementById("cpu-metric").textContent = data.metrics.find(m => m.resource === "CPU Usage").used_percent + "%";
+                document.getElementById("ram-metric").textContent = data.metrics.find(m => m.resource === "RAM Usage").used_percent + "%";
+                document.getElementById("disk-metric").textContent = data.metrics.find(m => m.resource === "Disk Space").used_percent + "%";
+
+                return vegaEmbed("#server-status-chart", {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "description": "Live server CPU, RAM, and Disk utilization percentages.",
+                    "width": 500,
+                    "height": {"step": 36},
+                    "data": {"values": data.metrics},
+                    "mark": {"type": "bar", "cornerRadiusEnd": 4},
+                    "encoding": {
+                        "x": {
+                            "field": "used_percent",
+                            "type": "quantitative",
+                            "title": "Utilization (%)",
+                            "scale": {"domain": [0, 100]}
+                        },
+                        "y": {
+                            "field": "resource",
+                            "type": "nominal",
+                            "title": "Resource",
+                            "sort": null
+                        },
+                        "color": {
+                            "field": "used_percent",
+                            "type": "quantitative",
+                            "scale": {"domain": [0, 50, 85], "range": ["#2e7d32", "#f9a825", "#c62828"]},
+                            "legend": null
+                        },
+                        "tooltip": [
+                            {"field": "resource", "type": "nominal", "title": "Resource"},
+                            {"field": "used_percent", "type": "quantitative", "title": "Used (%)"},
+                            {"field": "detail", "type": "nominal", "title": "Details"}
+                        ]
+                    }
+                }).then(() => {
+                    serverStatusMessage.textContent = "";
+                });
+            })
+            .catch(error => {
+                serverStatusMessage.textContent = "Unable to load server metrics. Please try again later.";
                 console.error(error);
             });
     </script>

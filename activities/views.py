@@ -504,3 +504,47 @@ def toggle_favorite(request, pk):
         activity.favorited_by.add(request.user)
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
+# ================================================================================================
+# 10) Dashboard Widgets - System Performance (Server Status)
+# ================================================================================================
+
+import platform
+import time
+import psutil
+
+SERVER_START_TIME = time.time()
+
+
+@login_required
+def server_status_api(request):
+    cpu_percent = psutil.cpu_percent(interval=0.2)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage("/")
+    uptime_seconds = int(time.time() - SERVER_START_TIME)
+
+    hours, remainder = divmod(uptime_seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    data = {
+        "status": "Healthy" if cpu_percent < 85 and memory.percent < 85 else "High Load",
+        "uptime": f"{hours}h {minutes}m",
+        "os": f"{platform.system()} ({platform.machine()})",
+        "metrics": [
+            {
+                "resource": "CPU Usage",
+                "used_percent": round(cpu_percent, 1),
+                "detail": f"{cpu_percent}% across {psutil.cpu_count()} cores",
+            },
+            {
+                "resource": "RAM Usage",
+                "used_percent": round(memory.percent, 1),
+                "detail": f"{round(memory.used / (1024**3), 2)} GB / {round(memory.total / (1024**3), 2)} GB",
+            },
+            {
+                "resource": "Disk Space",
+                "used_percent": round(disk.percent, 1),
+                "detail": f"{round(disk.used / (1024**3), 1)} GB / {round(disk.total / (1024**3), 1)} GB",
+            },
+        ],
+    }
+    return JsonResponse(data)
