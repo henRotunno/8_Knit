@@ -20,11 +20,19 @@ from django.views.generic import ListView
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 
+from .forms import ActivityPromptForm
+from .local_llm import (
+    RecommendationUnavailable,
+    recommend_activities,
+    generate_local_response,
+)
 from .hybrid_pipeline import run_hybrid_pipeline
+
 import time
-from activities.local_llm import generate_local_response
 from django.db.models import Avg, Min, Max
+
 EXTERNAL_URL = "https://bored-api.appbrewery.com/filter"
+
 VALID_TYPES = {
     "education",
     "recreational",
@@ -44,30 +52,17 @@ def home(request):
    return render(request, 'home.html')
 
 def local_llm_view(request):
-    user_input = ""
-    response_text = ""
-    error = ""
+    form = ActivityPromptForm(request.POST if request.method == "POST" else None)
+    context = {"form": form}
+    if request.method == "POST" and form.is_valid():
+        try:
+            context["response_text"], context["sources"] = recommend_activities(
+                form.cleaned_data["prompt"]
+            )
+        except RecommendationUnavailable as exc:
+            context["error"] = str(exc)
 
-    if request.method == "POST":
-        user_input = request.POST.get("prompt", "").strip()
-
-        if not user_input:
-            error = "Please enter something first."
-        else:
-            try:
-                response_text = generate_local_response(user_input)
-            except Exception as e:
-                error = f"Local model error: {str(e)}"
-
-    return render(
-        request,
-        "local_llm.html",
-        {
-            "user_input": user_input,
-            "response_text": response_text,
-            "error": error,
-        },
-    )
+    return render(request, "local_llm.html", context)
 
 # ================================================================================================
 # 2) Friends_list view
@@ -606,6 +601,8 @@ def hybrid_ai_view(request):
     """
     context = {}
     if request.method == "POST":
+        from .hybrid_pipeline import run_hybrid_pipeline
+
         user_text = request.POST.get("user_text", "")
         result = run_hybrid_pipeline(user_text)
         context["result"] = result
@@ -613,3 +610,62 @@ def hybrid_ai_view(request):
 
     return render(request, "hybrid_ai.html", context)
 
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def toggle_favorite(request, pk):
+    activity = get_object_or_404(Activities, pk=pk)
+    if request.user in activity.favorited_by.all():
+        activity.favorited_by.remove(request.user)
+    else:
+        activity.favorited_by.add(request.user)
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+# ================================================================================================
+# 10) Dashboard Widgets - System Performance (Server Status)
+# ================================================================================================
+
+import platform
+import time
+import psutil
+
+SERVER_START_TIME = time.time()
+
+
+@login_required
+def server_status_api(request):
+    cpu_percent = psutil.cpu_percent(interval=0.2)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage("/")
+    uptime_seconds = int(time.time() - SERVER_START_TIME)
+
+    hours, remainder = divmod(uptime_seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    data = {
+        "status": "Healthy" if cpu_percent < 85 and memory.percent < 85 else "High Load",
+        "uptime": f"{hours}h {minutes}m",
+        "os": f"{platform.system()} ({platform.machine()})",
+        "metrics": [
+            {
+                "resource": "CPU Usage",
+                "used_percent": round(cpu_percent, 1),
+                "detail": f"{cpu_percent}% across {psutil.cpu_count()} cores",
+            },
+            {
+                "resource": "RAM Usage",
+                "used_percent": round(memory.percent, 1),
+                "detail": f"{round(memory.used / (1024**3), 2)} GB / {round(memory.total / (1024**3), 2)} GB",
+            },
+            {
+                "resource": "Disk Space",
+                "used_percent": round(disk.percent, 1),
+                "detail": f"{round(disk.used / (1024**3), 1)} GB / {round(disk.total / (1024**3), 1)} GB",
+            },
+        ],
+    }
+    return JsonResponse(data)

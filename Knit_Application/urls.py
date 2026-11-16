@@ -24,6 +24,7 @@ from activities.api_views import (
    activities_api,
    activities_http_api,
    activity_category_summary,
+   most_favorited_activities,
    user_friend_summary
 )
 from django.views.generic import TemplateView
@@ -59,6 +60,11 @@ path("api/performance/", views.activity_performance_stats, name="activity_perfor
         "api/chart/activity-categories/",
         activity_category_summary,
         name="activity_category_summary",
+       ),
+   path(
+        "api/chart/most-favorited-activities/",
+        most_favorited_activities,
+        name="most_favorited_activities",
        ),
    path(
         "api/chart/user-friends/",
@@ -114,7 +120,12 @@ path("api/performance/", views.activity_performance_stats, name="activity_perfor
     path("signup/", views.signup_view, name="signup_urlpattern"),
 
     path('accounts/', include('allauth.urls')),
+
+    path("activity/<int:pk>/favorite/", views.toggle_favorite, name="toggle_favorite"),
+
+    path("api/server-status/", views.server_status_api, name="server_status_api"),
 ]
+
 
 
 

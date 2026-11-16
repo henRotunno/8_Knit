@@ -9,6 +9,21 @@ staticfiles/
 client_secret_*.json
 *.bin
 *.safetensors
-*.pt.DS_Store
+*.pt
 *.zip
 .idea/
+.cache/
+*.gguf
+
+# Local model caches and additional model-weight formats
+.huggingface/
+huggingface/
+hf_cache/
+model_cache/
+models--*/
+*.ggml
+*.pth
+*.ckpt
+*.onnx
+*.h5
+*.hdf5

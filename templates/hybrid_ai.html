@@ -40,8 +40,12 @@
         </p>
         {% endif %}
 
+        {% if result.message %}
+        <p role="alert">{{ result.message }}</p>
+        {% else %}
         <h4>API Response:</h4>
         <pre>{{ result.api_output }}</pre>
+        {% endif %}
     </div>
     {% endif %}
 
