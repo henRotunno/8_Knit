@@ -13,31 +13,207 @@
     <h2 style="text-align:center;" class="mb-0">Recommendations</h2>
   </div>
 
-    <h2 style="text-align:center;">Find an activity</h2>
+
+<div class="container mt-4">
+    <div class="row g-4">
+
+        <!-- LEFT: Activity Search -->
+        <div class="col-lg-6">
+            <h2 class="text-center">Find an activity</h2>
+
+            <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
+                <select id="type" class="form-select w-auto">
+                    <option>education</option>
+                    <option>recreational</option>
+                    <option>social</option>
+                    <option>diy</option>
+                    <option>charity</option>
+                    <option>cooking</option>
+                    <option>relaxation</option>
+                    <option>music</option>
+                    <option>busywork</option>
+                </select>
+
+                <select id="participants" class="form-select w-auto">
+                    <option value="">Any number of people</option>
+                    <option value="1">Just me</option>
+                    <option value="2">2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4">4 people</option>
+                </select>
+
+                <button id="search" class="btn"
+                        style="background-color:#FF552E; color:white;">
+                    Search
+                </button>
+            </div>
+
+            <p id="status" class="mt-3"></p>
+            <ul id="results"></ul>
+        </div>
+
+        <!-- RIGHT: System Performance -->
+        <div class="col-lg-6">
+            <h3 class="text-center" style="color:#13294B;">
+                System Performance
+            </h3>
+
+            <!-- Keep your existing six performance cards here -->
+        </div>
+
+    </div>
+</div>
 
 
-    <!-- Keys for the bored api -->
-<select id="type">
-  <option>education</option><option>recreational</option><option>social</option>
-  <option>diy</option><option>charity</option><option>cooking</option>
-  <option>relaxation</option><option>music</option><option>busywork</option>
-</select>
+<!-- System Performance Widget -->
+<div class="container mt-5 mb-4">
 
-<select id="participants">
-  <option value="">Any number of people</option>
-  <option value="1">Just me</option>
-  <option value="2">2 people</option>
-  <option value="3">3 people</option>
-  <option value="4">4 people</option>
-</select>
-    <!-- The user can enter the amount of participants for the activity
-     Note: This is mainly a tool for the user to think of what they might want to do
-     on the activity page. This is the api's parameters, helps prevent 404s that i kept running into-->
-<button id="search">Search</button>
+    <p class="text-center text-muted">
+        Activity Recommendation Response Statistics
+    </p>
 
-<p id="status"></p>
-<ul id="results"></ul>
+    <div class="row g-3 mt-2">
+
+<!-- Average Response Time -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #FF552E;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Average Response
+            </h5>
+            <h3 id="average-response">
+                {% if system_performance.average_response != None %}
+                    {{ system_performance.average_response }} ms
+                {% else %}
+                    --
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Fastest Response -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #FF552E;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Fastest Response
+            </h5>
+            <h3 id="fastest-response">
+                {% if system_performance.fastest_response != None %}
+                    {{ system_performance.fastest_response }} ms
+                {% else %}
+                    --
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Slowest Response -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #FF552E;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Slowest Response
+            </h5>
+            <h3 id="slowest-response">
+                {% if system_performance.slowest_response != None %}
+                    {{ system_performance.slowest_response }} ms
+                {% else %}
+                    --
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Total Requests -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #13294B;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Total Requests
+            </h5>
+            <h3 id="total-requests">
+                {{ system_performance.total_requests }}
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Successful Requests -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #13294B;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Successful Requests
+            </h5>
+            <h3 id="successful-requests">
+                {{ system_performance.successful_requests }}
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Success Rate -->
+<div class="col-md-4">
+    <div class="card text-center h-100"
+         style="border-top: 4px solid #13294B;">
+        <div class="card-body">
+            <h5 style="color: #13294B;">
+                Success Rate
+            </h5>
+            <h3 id="success-rate">
+                {{ system_performance.success_rate }}%
+            </h3>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+<!-- End System Performance Widget -->
+
     <script>
+
+async function updatePerformanceStats() {
+    try {
+        const response = await fetch("{% url 'activity_performance_stats' %}");
+        const stats = await response.json();
+
+        if (!response.ok) {
+            console.error("Could not retrieve performance statistics.");
+            return;
+        }
+
+        document.getElementById("average-response").textContent =
+            stats.average_response !== null ? stats.average_response + " ms" : "--";
+
+        document.getElementById("fastest-response").textContent =
+            stats.fastest_response !== null ? stats.fastest_response + " ms" : "--";
+
+        document.getElementById("slowest-response").textContent =
+            stats.slowest_response !== null ? stats.slowest_response + " ms" : "--";
+
+        document.getElementById("total-requests").textContent =
+            stats.total_requests;
+
+        document.getElementById("successful-requests").textContent =
+            stats.successful_requests;
+
+        document.getElementById("success-rate").textContent =
+            stats.success_rate + "%";
+
+    } catch (error) {
+        console.error("Performance update failed:", error);
+    }
+}
+
 document.getElementById("search").addEventListener("click", async () => {
   const status = document.getElementById("status");
   const list = document.getElementById("results");
@@ -52,7 +228,7 @@ document.getElementById("search").addEventListener("click", async () => {
     const resp = await fetch(`{% url 'recommend_activity' %}?${params}`);
     const data = await resp.json();
     if (!resp.ok) { status.textContent = data.error; return; }
-
+await updatePerformanceStats();
     const a = data.analytics;
     status.textContent = data.suggestions.length
       ? `${data.suggestions.length} suggestions | ${a.free_count} free | avg price score ${a.avg_price} (out of 1.0)`

@@ -54,6 +54,7 @@ urlpatterns = [
    path("stats-chart/", views.stats_chart, name="stats-chart"),
    path("stats/", views.stats, name="stats"),
    path("api/recommend/", views.recommend_activity, name="recommend_activity"),
+path("api/performance/", views.activity_performance_stats, name="activity_performance_stats"),
    path(
         "api/chart/activity-categories/",
         activity_category_summary,

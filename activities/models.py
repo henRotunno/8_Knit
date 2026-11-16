@@ -76,6 +76,22 @@ class Friends(models.Model):
 # http response (function based 2)
 
 
+class ActivityPerformance(models.Model):
+    # How long the activity recommendation request took, in milliseconds
+    response_time_ms = models.FloatField()
+
+    # Whether the request completed successfully
+    successful = models.BooleanField(default=True)
+
+    # When the performance measurement was recorded
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Activity response: {self.response_time_ms:.2f} ms"
+
 
 
 

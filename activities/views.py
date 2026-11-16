@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from activities.models import Friends, Notifications, Recommendations, Activities
+from activities.models import Friends, Notifications, Recommendations, Activities, ActivityPerformance
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import ListView
@@ -21,9 +21,21 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 
 from .hybrid_pipeline import run_hybrid_pipeline
-
+import time
 from activities.local_llm import generate_local_response
-
+from django.db.models import Avg, Min, Max
+EXTERNAL_URL = "https://bored-api.appbrewery.com/filter"
+VALID_TYPES = {
+    "education",
+    "recreational",
+    "social",
+    "diy",
+    "charity",
+    "cooking",
+    "relaxation",
+    "music",
+    "busywork",
+}
 # ================================================================================================
 # 1) Home page view
 # ================================================================================================
@@ -103,17 +115,52 @@ def notifications(request):
 # ================================================================================================
 
 
+
 class Recommendation(LoginRequiredMixin, ListView):
     model = Recommendations
     template_name = "recommendations.html"
     context_object_name = "recommendations"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-# api url
-EXTERNAL_URL = "https://bored-api.appbrewery.com/filter"
-# keys that work with the api
-VALID_TYPES = {"education", "recreational", "social", "diy", "charity",
-              "cooking", "relaxation", "music", "busywork"}
+        # Get all successful activity recommendation requests
+        successful_records = ActivityPerformance.objects.filter(
+            successful=True
+        )
+
+        # Calculate response time statistics
+        performance = successful_records.aggregate(
+            average=Avg("response_time_ms"),
+            fastest=Min("response_time_ms"),
+            slowest=Max("response_time_ms"),
+        )
+
+        # Count all requests
+        total_requests = ActivityPerformance.objects.count()
+        successful_requests = successful_records.count()
+
+        # Calculate success rate
+        success_rate = (
+            round((successful_requests / total_requests) * 100, 2)
+            if total_requests > 0 else 0
+        )
+
+        # Add performance statistics to the template
+        context["system_performance"] = {
+            "average_response": round(performance["average"], 2)
+                if performance["average"] is not None else None,
+            "fastest_response": round(performance["fastest"], 2)
+                if performance["fastest"] is not None else None,
+            "slowest_response": round(performance["slowest"], 2)
+                if performance["slowest"] is not None else None,
+            "total_requests": total_requests,
+            "successful_requests": successful_requests,
+            "success_rate": success_rate,
+        }
+
+        return context
+
 
 
 
@@ -135,95 +182,160 @@ def price_label(p):
 
 @login_required
 def recommend_activity(request):
-   q = request.GET.get("q", "")
-   if not q:
-       return JsonResponse({"error": "Missing query parameter ?q="}, status=400)
-   if q not in VALID_TYPES:
-       return JsonResponse({"error": f"Unknown type '{q}'",
-                            "valid_types": sorted(VALID_TYPES)}, status=400)
+    # Start measuring recommendation processing time
+    start_time = time.perf_counter()
+
+    q = request.GET.get("q", "")
+    if not q:
+        return JsonResponse({"error": "Missing query parameter ?q="}, status=400)
+
+    if q not in VALID_TYPES:
+        return JsonResponse({
+            "error": f"Unknown type '{q}'",
+            "valid_types": sorted(VALID_TYPES)
+        }, status=400)
+
+    params = {"type": q}
+    participants = request.GET.get("participants")
+
+    if participants and participants.isdigit():
+        params["participants"] = participants
+
+    try:
+        resp = requests.get(EXTERNAL_URL, params=params, timeout=5)
+
+        if resp.status_code == 404:
+            external = []
+        else:
+            resp.raise_for_status()
+            external = resp.json()
+
+    except requests.Timeout:
+        # Record unsuccessful request timing
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+
+        ActivityPerformance.objects.create(
+            response_time_ms=elapsed_ms,
+            successful=False
+        )
+
+        return JsonResponse({"error": "External API timed out"}, status=504)
+
+    except (requests.RequestException, ValueError):
+        # Record unsuccessful request timing
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+
+        ActivityPerformance.objects.create(
+            response_time_ms=elapsed_ms,
+            successful=False
+        )
+
+        return JsonResponse({"error": "Could not fetch external data"}, status=502)
+
+    if isinstance(external, dict):
+        external = []
+
+    internal_qs = Activities.objects.filter(category__iexact=q)
+    internal_names = {a.activity_name.lower() for a in internal_qs}
+
+    # Create live suggestions
+    suggestions = []
+
+    for item in external[:15]:
+        text = item.get("activity", "")
+
+        suggestions.append({
+            "activity": text,
+            "type": item.get("type"),
+            "participants": item.get("participants"),
+            "price": item.get("price"),
+            "cost": price_label(item.get("price")),
+            "accessibility": item.get("accessibility"),
+            "already_in_our_app": any(
+                n in text.lower() or text.lower() in n
+                for n in internal_names
+            ),
+        })
+
+    # Analytics
+    prices = [
+        s["price"] for s in suggestions
+        if isinstance(s["price"], (int, float))
+    ]
+
+    accessibility_counts = {}
+
+    for s in suggestions:
+        label = s["accessibility"] or "Unknown"
+        accessibility_counts[label] = accessibility_counts.get(label, 0) + 1
+
+    analytics = {
+        "avg_price": round(sum(prices) / len(prices), 2) if prices else None,
+        "free_count": sum(1 for s in suggestions if s["cost"] == "Free"),
+        "accessibility_counts": accessibility_counts,
+        "overlap_with_internal": sum(
+            s["already_in_our_app"] for s in suggestions
+        ),
+        "internal_category_counts": list(
+            Activities.objects.values("category").annotate(
+                total=Count("activity_id")
+            )
+        ),
+    }
+
+    # Prepare the response data
+    response_data = {
+        "query": q,
+        "internal_matches": sorted(
+            a.activity_name for a in internal_qs
+        ),
+        "analytics": analytics,
+        "suggestions": suggestions,
+    }
+
+    # Calculate total processing time in milliseconds
+    elapsed_ms = (time.perf_counter() - start_time) * 1000
+
+    # Save successful request performance
+    ActivityPerformance.objects.create(
+        response_time_ms=elapsed_ms,
+        successful=True
+    )
+
+    return JsonResponse(response_data)
 
 
-   params = {"type": q}
-   participants = request.GET.get("participants")
-   if participants and participants.isdigit():
-       params["participants"] = participants
+@login_required
+def activity_performance_stats(request):
+    successful_records = ActivityPerformance.objects.filter(
+        successful=True
+    )
 
+    performance = successful_records.aggregate(
+        average=Avg("response_time_ms"),
+        fastest=Min("response_time_ms"),
+        slowest=Max("response_time_ms"),
+    )
 
-   try:
-       resp = requests.get(EXTERNAL_URL, params=params, timeout=5)
-       if resp.status_code == 404:
-           external = []  # no matches for this filter
-       else:
-           resp.raise_for_status()
-           external = resp.json()
-   except requests.Timeout:
-       return JsonResponse({"error": "External API timed out"}, status=504)\
-       # except api goes down
+    total_requests = ActivityPerformance.objects.count()
+    successful_requests = successful_records.count()
 
+    success_rate = (
+        round((successful_requests / total_requests) * 100, 2)
+        if total_requests > 0 else 0
+    )
 
-   except (requests.RequestException, ValueError):
-       return JsonResponse({"error": "Could not fetch external data"}, status=502)
-       # bad value
-
-
-   if isinstance(external, dict):
-       external = []
-
-
-
-
-   internal_qs = Activities.objects.filter(category__iexact=q)
-   internal_names = {a.activity_name.lower() for a in internal_qs}
-
-
-   # create live
-   suggestions = []
-   for item in external[:15]:
-       # change the external[:x] to adjust number of selection!!!!!!
-       text = item.get("activity", "")
-       suggestions.append({
-           "activity": text,
-           "type": item.get("type"),
-           "participants": item.get("participants"),
-           "price": item.get("price"),
-           "cost": price_label(item.get("price")),
-           "accessibility": item.get("accessibility"),
-           "already_in_our_app": any(n in text.lower() or text.lower() in n
-                                     for n in internal_names),
-           # for each selection, extract this data
-           # already in app crosscheck w/ our db.
-       })
-
-
-   # analytics
-   prices = [s["price"] for s in suggestions if isinstance(s["price"], (int, float))]
-   accessibility_counts = {}
-   for s in suggestions:
-       label = s["accessibility"] or "Unknown"
-       accessibility_counts[label] = accessibility_counts.get(label, 0) + 1
-
-
-   # apply analytics to data, give users an idea of how accesible the activity is.
-   analytics = {
-       "avg_price": round(sum(prices) / len(prices), 2) if prices else None,
-           # average price of all the activities listed
-       "free_count": sum(1 for s in suggestions if s["cost"] == "Free"),
-           # count of free acitivites
-       "accessibility_counts": accessibility_counts,
-       "overlap_with_internal": sum(s["already_in_our_app"] for s in suggestions),
-       "internal_category_counts": list(
-           Activities.objects.values("category").annotate(total=Count("activity_id"))
-       ),
-   }
-   # dictionary to return, handle jsonResponse in templates --> recommendations.html
-   return JsonResponse({
-       "query": q,
-       "internal_matches": sorted(a.activity_name for a in internal_qs),
-       "analytics": analytics,
-       "suggestions": suggestions,
-   })
-
-
+    return JsonResponse({
+        "average_response": round(performance["average"], 2)
+            if performance["average"] is not None else None,
+        "fastest_response": round(performance["fastest"], 2)
+            if performance["fastest"] is not None else None,
+        "slowest_response": round(performance["slowest"], 2)
+            if performance["slowest"] is not None else None,
+        "total_requests": total_requests,
+        "successful_requests": successful_requests,
+        "success_rate": success_rate,
+    })
 
 
 # ================================================================================================
