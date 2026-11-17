@@ -1,0 +1,26 @@
+<h1>Cybersecurity Dashboard</h1>
+
+<h3>Total Users: {{ total_users }}</h3>
+<h3>Active Users: {{ active_users }}</h3>
+<h3>Successful Logins: {{ successful_logins }}</h3>
+<h3>Failed Logins: {{ failed_logins }}</h3>
+
+<h2>Recent Security Events</h2>
+
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Event</th>
+        <th>IP Address</th>
+        <th>Timestamp</th>
+    </tr>
+
+    {% for event in recent_events %}
+    <tr>
+        <td>{{ event.username }}</td>
+        <td>{{ event.get_event_type_display }}</td>
+        <td>{{ event.ip_address }}</td>
+        <td>{{ event.timestamp }}</td>
+    </tr>
+    {% endfor %}
+</table>

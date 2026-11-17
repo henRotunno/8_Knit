@@ -124,6 +124,9 @@ path("api/performance/", views.activity_performance_stats, name="activity_perfor
     path("activity/<int:pk>/favorite/", views.toggle_favorite, name="toggle_favorite"),
 
     path("api/server-status/", views.server_status_api, name="server_status_api"),
+
+    path('security/', views.security_dashboard, name='security_dashboard')
+
 ]
 
 

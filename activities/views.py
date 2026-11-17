@@ -669,3 +669,41 @@ def server_status_api(request):
         ],
     }
     return JsonResponse(data)
+
+# cyber metrics
+from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
+from .models import Cyber
+from django.contrib.auth.decorators import user_passes_test
+@user_passes_test(lambda user: user.is_superuser)
+
+def security_dashboard(request):
+
+    last_30_days = timezone.now() - timedelta(days=30)
+
+    context = {
+        'total_users': User.objects.count(),
+
+        'active_users': User.objects.filter(
+            is_active=True
+        ).count(),
+
+        'successful_logins': Cyber.objects.filter(
+            event_type='LOGIN_SUCCESS',
+            timestamp__gte=last_30_days
+        ).count(),
+
+        'failed_logins': Cyber.objects.filter(
+            event_type='LOGIN_FAILURE',
+            timestamp__gte=last_30_days
+        ).count(),
+
+        'recent_events': Cyber.objects.order_by(
+            '-timestamp'
+        )[:10],
+    }
+
+    return render(request, 'activities/security_dashboard.html', context)
+

@@ -101,6 +101,33 @@ class ActivityPerformance(models.Model):
 
 
 
+class Cyber(models.Model):
+    cats = [
+        ("LOGIN_SUCCESS", "Successful Login"),
+        ("LOGIN_FAILURE", "Failed Login"),
+        ("LOGOUT", "Logout"),
+        ("CREATE_ACCOUNT", "Create Account"),
+    ]
+
+    username = models.CharField(max_length=150)
+    event_type = models.CharField(
+        max_length=30,
+        choices=cats
+    )
+
+
+    ip_address = models.GenericIPAddressField(
+    null=True,
+    blank=True
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.event_type} - {self.username}"
+
+
+
+
 
 
 
